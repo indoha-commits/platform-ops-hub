@@ -210,13 +210,13 @@ export function RiskCenterPage() {
         </div>
       </div>
 
-      {loading ? (
+        {loading ? (
         <div className="space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="h-24 bg-card border rounded-xl animate-pulse" />
           ))}
         </div>
-      ) : error ? (
+        ) : error ? (
         <div className="text-sm text-destructive">{error}</div>
       ) : totalVisible === 0 && snoozedCount === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 gap-3 text-muted-foreground">
@@ -448,9 +448,9 @@ export function RiskCenterPage() {
                     >
                       Unsnooze
                     </button>
-                  </div>
-                ))}
               </div>
+            ))}
+          </div>
             </div>
           )}
         </>

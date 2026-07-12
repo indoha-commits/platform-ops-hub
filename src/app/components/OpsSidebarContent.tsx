@@ -2,7 +2,6 @@ import {
   Activity,
   AlertTriangle,
   Banknote,
-  ChevronDown,
   FileSpreadsheet,
   GitBranch,
   LogOut,
@@ -10,7 +9,6 @@ import {
   Receipt,
   RefreshCw,
 } from 'lucide-react';
-import { useState } from 'react';
 
 interface OpsSidebarContentProps {
   currentPage: string;
@@ -19,106 +17,69 @@ interface OpsSidebarContentProps {
   onNavigate?: () => void;
 }
 
-type NavItem = {
-  id: string;
+type NavGroup = {
   label: string;
-  description: string;
-  icon: React.ElementType;
+  items: Array<{ id: string; label: string; icon: React.ElementType }>;
 };
 
-const financeItems: NavItem[] = [
-  { id: 'shipments', label: 'Shipments', description: 'Core system (BoL)', icon: FileSpreadsheet },
-  { id: 'payments', label: 'Payments', description: 'Cash control', icon: Banknote },
-  { id: 'receivables', label: 'Receivables', description: 'Outstanding risk', icon: Receipt },
+const navGroups: NavGroup[] = [
+  {
+    label: 'Finance',
+    items: [
+      { id: 'shipments', label: 'Shipments', icon: FileSpreadsheet },
+      { id: 'payments', label: 'Payments', icon: Banknote },
+      { id: 'receivables', label: 'Receivables', icon: Receipt },
+    ],
+  },
+  {
+    label: 'Operations',
+    items: [
+      { id: 'action-panel', label: 'Action Panel', icon: Radar },
+      { id: 'pipeline', label: 'Pipeline', icon: GitBranch },
+      { id: 'monitoring', label: 'Monitoring', icon: Activity },
+      { id: 'risk-center', label: 'Risk Center', icon: AlertTriangle },
+    ],
+  },
 ];
 
-const operationsItems: NavItem[] = [
-  { id: 'action-panel', label: 'Action Panel', description: "Today's priorities", icon: Radar },
-  { id: 'pipeline', label: 'Pipeline', description: 'Track by stage', icon: GitBranch },
-  { id: 'monitoring', label: 'Monitoring', description: 'All containers live', icon: Activity },
-  { id: 'risk-center', label: 'Risk Center', description: 'Flags & alerts', icon: AlertTriangle },
-];
-
-function NavSection({
-  label,
-  items,
+function NavButton({
+  item,
   currentPage,
   onPageChange,
   onNavigate,
-  defaultOpen = true,
 }: {
-  label: string;
-  items: NavItem[];
+  item: NavGroup['items'][number];
   currentPage: string;
   onPageChange: (page: string) => void;
   onNavigate?: () => void;
-  defaultOpen?: boolean;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
+  const Icon = item.icon;
+  const isActive = currentPage === item.id;
 
   return (
-    <div className="mb-1">
-      {/* Section header — click to collapse */}
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between px-3 py-1.5 mb-0.5 rounded-lg transition-colors"
-        style={{ color: 'var(--sidebar-foreground)' }}
-        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.04)'; }}
-        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-      >
-        <span className="text-[10px] font-semibold uppercase tracking-widest opacity-40">
-          {label}
-        </span>
-        <ChevronDown
-          className="w-3 h-3 opacity-30 transition-transform duration-200"
-          style={{ transform: open ? 'rotate(0deg)' : 'rotate(-90deg)' }}
-        />
-      </button>
-
-      {open && items.map((item) => {
-        const Icon = item.icon;
-        const isActive = currentPage === item.id;
-
-        return (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => { onPageChange(item.id); onNavigate?.(); }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 relative mb-0.5"
-            style={{
-              backgroundColor: isActive ? 'rgba(255,255,255,0.08)' : 'transparent',
-              color: 'var(--sidebar-foreground)',
-            }}
-            onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.04)'; }}
-            onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.backgroundColor = 'transparent'; }}
-          >
-            {isActive && (
-              <span
-                className="absolute left-0 top-2 bottom-2 w-0.5 rounded-full"
-                style={{ backgroundColor: 'rgba(255,255,255,0.6)' }}
-              />
-            )}
-            <span
-              className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-              style={{ backgroundColor: isActive ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.05)' }}
-            >
-              <Icon
-                className="w-4 h-4"
-                strokeWidth={isActive ? 2 : 1.5}
-                style={{ opacity: isActive ? 1 : 0.65 }}
-              />
-            </span>
-            <div className="min-w-0 text-left">
-              <p className="text-sm leading-tight" style={{ fontWeight: isActive ? 600 : 400, opacity: isActive ? 1 : 0.8 }}>
-                {item.label}
-              </p>
-              <p className="text-xs leading-tight mt-0.5 opacity-40 truncate">{item.description}</p>
-            </div>
-          </button>
-        );
-      })}
-    </div>
+    <button
+      onClick={() => {
+        onPageChange(item.id);
+        onNavigate?.();
+      }}
+      aria-current={isActive ? 'page' : undefined}
+      className="w-full flex items-center gap-3 px-3 py-2 rounded-md border-l-2 transition-all duration-150"
+      style={{
+        borderLeftColor: isActive ? '#5e6ad2' : 'transparent',
+        paddingLeft: isActive ? '10px' : '13px',
+        backgroundColor: isActive ? 'rgba(94, 106, 210, 0.20)' : 'transparent',
+        color: isActive ? '#f7f8f8' : 'var(--sidebar-foreground)',
+      }}
+      onMouseEnter={(e) => {
+        if (!isActive) e.currentTarget.style.backgroundColor = 'var(--sidebar-accent)';
+      }}
+      onMouseLeave={(e) => {
+        if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
+      }}
+    >
+      <Icon className="w-4 h-4" strokeWidth={1.5} style={{ opacity: isActive ? 1 : 0.65 }} />
+      <span className="text-sm" style={{ fontWeight: 400 }}>{item.label}</span>
+    </button>
   );
 }
 
@@ -126,69 +87,67 @@ export function OpsSidebarContent({ currentPage, onPageChange, onLogout, onNavig
   const now = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <div className="h-full w-full flex flex-col" style={{ color: 'var(--sidebar-foreground)' }}>
-
-      {/* ── Brand header ── */}
-      <div className="px-5 pt-7 pb-6 border-b" style={{ borderColor: 'var(--sidebar-border)' }}>
+    <div className="flex flex-col min-h-full whitespace-nowrap">
+      {/* Brand header */}
+      <div className="sticky top-0 z-10 flex items-center px-6 py-6 md:py-8 border-b" style={{ backgroundColor: 'var(--sidebar)', borderColor: 'var(--sidebar-border)' }}>
         <img
           src="/indataflow-logo.png"
           alt="InDataFlow"
-          className="h-14 w-auto brightness-0 invert"
+          className="h-[56px] md:h-[67px] w-auto brightness-0 invert"
         />
       </div>
 
-      {/* ── Navigation ── */}
-      <nav className="flex-1 px-3 py-5 overflow-y-auto">
-        <NavSection
-          label="Finance"
-          items={financeItems}
-          currentPage={currentPage}
-          onPageChange={onPageChange}
-          onNavigate={onNavigate}
-          defaultOpen={true}
-        />
-
-        <div className="my-3 mx-3 border-t opacity-10" style={{ borderColor: 'var(--sidebar-border)' }} />
-
-        <NavSection
-          label="Operations"
-          items={operationsItems}
-          currentPage={currentPage}
-          onPageChange={onPageChange}
-          onNavigate={onNavigate}
-          defaultOpen={true}
-        />
+      {/* Navigation */}
+      <nav className="flex-1 px-3 py-4 md:py-6" aria-label="Main navigation">
+        {navGroups.map((group) => (
+          <div key={group.label} className="mb-5">
+            <div
+              className="px-3 mb-1 text-xs font-semibold uppercase tracking-wider"
+              style={{ color: 'var(--sidebar-foreground)', opacity: 0.5 }}
+            >
+              {group.label}
+            </div>
+            <div className="space-y-0.5">
+              {group.items.map((item) => (
+                <NavButton
+                  key={item.id}
+                  item={item}
+                  currentPage={currentPage}
+                  onPageChange={onPageChange}
+                  onNavigate={onNavigate}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
       </nav>
 
-      {/* ── Footer ── */}
+      {/* Footer */}
       <div className="border-t shrink-0" style={{ borderColor: 'var(--sidebar-border)' }}>
-        <div className="px-5 py-3 flex items-center gap-2 opacity-40">
+        <div className="px-5 py-3 flex items-center gap-2" style={{ opacity: 0.4, color: 'var(--sidebar-foreground)' }}>
           <RefreshCw className="w-3 h-3 shrink-0" />
           <span className="text-xs">Live · {now}</span>
         </div>
-
         <div className="mx-4 border-t" style={{ borderColor: 'var(--sidebar-border)' }} />
-
         <div className="px-3 py-3">
           <button
             type="button"
             onClick={onLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150"
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-md transition-all duration-150"
             style={{ color: 'var(--sidebar-foreground)', backgroundColor: 'transparent' }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'; }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--sidebar-accent)'; }}
             onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
           >
             <span
               className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
               style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
             >
-              <LogOut className="w-4 h-4 opacity-60" strokeWidth={1.5} />
+              <LogOut className="w-4 h-4" strokeWidth={1.5} style={{ opacity: 0.6 }} />
             </span>
-            <span className="text-sm opacity-70">Sign out</span>
+            <span className="text-sm" style={{ opacity: 0.7 }}>Sign out</span>
           </button>
         </div>
       </div>
-
     </div>
   );
 }

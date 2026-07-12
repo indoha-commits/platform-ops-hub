@@ -172,7 +172,7 @@ export function ActionPanelPage() {
 
         {/* Stage rows */}
         <div className="divide-y" style={{ borderColor: 'var(--border)' }}>
-          {loading ? (
+        {loading ? (
             Array.from({ length: 7 }).map((_, i) => (
               <div key={i} className="px-5 py-3.5 flex items-center gap-4">
                 <div className="w-5 h-5 rounded bg-muted animate-pulse shrink-0" />
@@ -180,7 +180,7 @@ export function ActionPanelPage() {
                 <div className="w-8 h-5 rounded bg-muted animate-pulse shrink-0" />
               </div>
             ))
-          ) : error ? (
+        ) : error ? (
             <div className="px-5 py-6 text-sm text-destructive">{error}</div>
           ) : (
             // Rendered highest score first (score 7 → 1, matching the SUCOMO chart)
@@ -226,7 +226,7 @@ export function ActionPanelPage() {
                   <div className="text-xs text-muted-foreground tabular-nums w-9 text-right shrink-0">
                     {pct}%
                   </div>
-                </div>
+          </div>
               );
             })
           )}

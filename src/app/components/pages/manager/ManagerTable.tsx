@@ -90,9 +90,9 @@ export function ManagerTable({ rows }: { rows: ManagerContainer[] }) {
   return (
     <>
       <div className="divide-y" style={{ borderColor: 'var(--border)' }}>
-        {rows.map((r) => {
+          {rows.map((r) => {
           const progress = milestoneProgress(r.latest_event_type);
-          return (
+            return (
             <button
               key={r.cargo_id}
               type="button"
@@ -106,7 +106,7 @@ export function ManagerTable({ rows }: { rows: ManagerContainer[] }) {
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-mono text-sm font-semibold tracking-tight">
                       {r.cargo_id}
-                    </span>
+                  </span>
                     <VerifBadge status={r.verification_status} />
                   </div>
                   <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground flex-wrap">
@@ -168,9 +168,9 @@ export function ManagerTable({ rows }: { rows: ManagerContainer[] }) {
                 </div>
               </div>
             </button>
-          );
-        })}
-      </div>
+            );
+          })}
+    </div>
 
       <ContainerDetailDrawer
         container={selected}
