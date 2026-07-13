@@ -2,13 +2,26 @@ import {
   Activity,
   AlertTriangle,
   Banknote,
+  CreditCard,
   FileSpreadsheet,
   GitBranch,
   LogOut,
+  Moon,
   Radar,
   Receipt,
   RefreshCw,
+  Settings,
+  Sun,
+  User,
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '@/app/components/ui/dropdown-menu';
+import { useThemeToggle } from '@/app/hooks/useThemeToggle';
 
 interface OpsSidebarContentProps {
   currentPage: string;
@@ -38,6 +51,7 @@ const navGroups: NavGroup[] = [
       { id: 'pipeline', label: 'Pipeline', icon: GitBranch },
       { id: 'monitoring', label: 'Monitoring', icon: Activity },
       { id: 'risk-center', label: 'Risk Center', icon: AlertTriangle },
+      { id: 'billing', label: 'Billing', icon: CreditCard },
     ],
   },
 ];
@@ -63,11 +77,11 @@ function NavButton({
         onNavigate?.();
       }}
       aria-current={isActive ? 'page' : undefined}
-      className="w-full flex items-center gap-3 px-3 py-2 rounded-md border-l-2 transition-all duration-150"
+      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md border-l-[3px] transition-all duration-150"
       style={{
         borderLeftColor: isActive ? '#5e6ad2' : 'transparent',
-        paddingLeft: isActive ? '10px' : '13px',
-        backgroundColor: isActive ? 'rgba(94, 106, 210, 0.20)' : 'transparent',
+        paddingLeft: isActive ? '9px' : '13px',
+        backgroundColor: isActive ? 'rgba(94, 106, 210, 0.25)' : 'transparent',
         color: isActive ? '#f7f8f8' : 'var(--sidebar-foreground)',
       }}
       onMouseEnter={(e) => {
@@ -77,14 +91,15 @@ function NavButton({
         if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
       }}
     >
-      <Icon className="w-4 h-4" strokeWidth={1.5} style={{ opacity: isActive ? 1 : 0.65 }} />
-      <span className="text-sm" style={{ fontWeight: 400 }}>{item.label}</span>
+      <Icon className="w-[18px] h-[18px]" strokeWidth={1.5} style={{ opacity: isActive ? 1 : 0.65 }} />
+      <span className="text-sm" style={{ fontWeight: isActive ? 600 : 400 }}>{item.label}</span>
     </button>
   );
 }
 
 export function OpsSidebarContent({ currentPage, onPageChange, onLogout, onNavigate }: OpsSidebarContentProps) {
   const now = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  const { theme, toggleTheme } = useThemeToggle();
 
   return (
     <div className="flex flex-col min-h-full whitespace-nowrap">
@@ -100,9 +115,9 @@ export function OpsSidebarContent({ currentPage, onPageChange, onLogout, onNavig
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 md:py-6" aria-label="Main navigation">
         {navGroups.map((group) => (
-          <div key={group.label} className="mb-5">
+          <div key={group.label} className="mb-6">
             <div
-              className="px-3 mb-1 text-xs font-semibold uppercase tracking-wider"
+              className="px-3 mb-1.5 text-xs font-semibold uppercase tracking-wider"
               style={{ color: 'var(--sidebar-foreground)', opacity: 0.5 }}
             >
               {group.label}
@@ -124,28 +139,46 @@ export function OpsSidebarContent({ currentPage, onPageChange, onLogout, onNavig
 
       {/* Footer */}
       <div className="border-t shrink-0" style={{ borderColor: 'var(--sidebar-border)' }}>
-        <div className="px-5 py-3 flex items-center gap-2" style={{ opacity: 0.4, color: 'var(--sidebar-foreground)' }}>
+        <div className="px-5 py-3 flex items-center gap-2" style={{ opacity: 0.7, color: '#5e6ad2' }}>
           <RefreshCw className="w-3 h-3 shrink-0" />
-          <span className="text-xs">Live · {now}</span>
+          <span className="text-xs font-medium">Live · {now}</span>
         </div>
         <div className="mx-4 border-t" style={{ borderColor: 'var(--sidebar-border)' }} />
         <div className="px-3 py-3">
-          <button
-            type="button"
-            onClick={onLogout}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-md transition-all duration-150"
-            style={{ color: 'var(--sidebar-foreground)', backgroundColor: 'transparent' }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--sidebar-accent)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-          >
-            <span
-              className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-              style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
-            >
-              <LogOut className="w-4 h-4" strokeWidth={1.5} style={{ opacity: 0.6 }} />
-            </span>
-            <span className="text-sm" style={{ opacity: 0.7 }}>Sign out</span>
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md transition-all duration-150"
+                style={{ color: 'var(--sidebar-foreground)', backgroundColor: 'transparent' }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--sidebar-accent)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+              >
+                <span
+                  className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}
+                >
+                  <User className="w-[18px] h-[18px]" strokeWidth={1.5} style={{ opacity: 0.7 }} />
+                </span>
+                <span className="text-sm flex-1 text-left" style={{ opacity: 0.7 }}>Account</span>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" side="top" className="w-48">
+              <DropdownMenuItem onClick={toggleTheme} className="flex items-center gap-3 cursor-pointer">
+                {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                <span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="flex items-center gap-3 cursor-pointer">
+                <Settings className="w-4 h-4" />
+                <span>Settings</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={onLogout} className="flex items-center gap-3 cursor-pointer text-red-600 dark:text-red-400">
+                <LogOut className="w-4 h-4" />
+                <span>Sign out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </div>

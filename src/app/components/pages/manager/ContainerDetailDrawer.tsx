@@ -18,6 +18,7 @@ import {
   XCircle,
   Clock,
   AlertCircle,
+  ArrowLeft,
   ArrowRight,
   Calendar,
   User,
@@ -101,6 +102,15 @@ export function ContainerDetailDrawer({ container, open, onClose }: ContainerDet
             {/* Header */}
             <SheetHeader className="px-6 pt-6 pb-4 border-b shrink-0" style={{ borderColor: 'var(--border)' }}>
               <div className="flex items-start gap-3">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="inline-flex items-center justify-center w-11 h-11 shrink-0 rounded-lg border hover:bg-muted/50 transition-colors"
+                  style={{ borderColor: 'var(--border)' }}
+                  title="Close details"
+                >
+                  <ArrowLeft className="size-4" />
+                </button>
                 <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-primary/10 shrink-0">
                   <Package className="size-5 text-primary" />
                 </div>

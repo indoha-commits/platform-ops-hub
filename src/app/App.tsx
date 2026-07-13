@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
-import { LogOut, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { Sidebar } from '@/app/components/Sidebar';
 import { OpsSidebarContent } from '@/app/components/OpsSidebarContent';
 import { getSupabase } from '@/app/auth/supabase';
 import { Sheet, SheetContent } from '@/app/components/ui/sheet';
-import { useThemeToggle } from '@/app/hooks/useThemeToggle';
 import { ActionPanelPage } from '@/app/components/pages/manager/ActionPanelPage';
 import { PipelinePage } from '@/app/components/pages/manager/PipelinePage';
 import { MonitoringPage } from '@/app/components/pages/manager/MonitoringPage';
 import { RiskCenterPage } from '@/app/components/pages/manager/RiskCenterPage';
 import { ShipmentsPage } from '@/app/components/pages/manager/ShipmentsPage';
+import { BillingPage } from '@/app/components/pages/manager/BillingPage';
 import { PaymentsPage } from '@/app/components/pages/manager/PaymentsPage';
 import { ReceivablesPage } from '@/app/components/pages/manager/ReceivablesPage';
 
@@ -21,7 +21,8 @@ type ManagerPageId =
   | 'action-panel'
   | 'pipeline'
   | 'monitoring'
-  | 'risk-center';
+  | 'risk-center'
+  | 'billing';
 
 const pageToPath: Record<ManagerPageId, string> = {
   shipments: 'shipments',
@@ -31,6 +32,7 @@ const pageToPath: Record<ManagerPageId, string> = {
   pipeline: 'pipeline',
   monitoring: 'monitoring',
   'risk-center': 'risk-center',
+  billing: 'billing',
 };
 
 const pathToPage: Record<string, ManagerPageId> = {
@@ -41,6 +43,7 @@ const pathToPage: Record<string, ManagerPageId> = {
   pipeline: 'pipeline',
   monitoring: 'monitoring',
   'risk-center': 'risk-center',
+  billing: 'billing',
 };
 
 function requireEnv(name: string): string {
@@ -89,6 +92,8 @@ function ManagerPageRenderer({
       return <MonitoringPage />;
     case 'risk-center':
       return <RiskCenterPage />;
+    case 'billing':
+      return <BillingPage />;
     default:
       return <ShipmentsPage />;
   }
@@ -97,7 +102,6 @@ function ManagerPageRenderer({
 export default function App() {
   const [dataSourceConnected, setDataSourceConnected] = useState<boolean | null>(true);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const { theme, toggleTheme } = useThemeToggle();
   const { currentPage, setCurrentPage } = useManagerRouteState();
   const currentPageMemo = useMemo(() => currentPage, [currentPage]);
 
@@ -158,23 +162,6 @@ export default function App() {
         <div className="min-w-0 flex-1">
           <img src="/indataflow-logo.png" alt="InDataFlow" className="h-7 w-auto brightness-0 dark:invert" />
         </div>
-        <button
-          type="button"
-          onClick={toggleTheme}
-          className="px-3 py-2 rounded border text-xs"
-          style={{ borderColor: 'var(--border)' }}
-        >
-          {theme === 'dark' ? 'Light mode' : 'Dark mode'}
-        </button>
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="inline-flex items-center justify-center w-10 h-10 rounded border"
-          style={{ borderColor: 'var(--border)' }}
-          aria-label="Logout"
-        >
-          <LogOut className="w-4 h-4" />
-        </button>
       </div>
 
       {/* Mobile nav drawer */}
@@ -190,25 +177,6 @@ export default function App() {
       </Sheet>
 
       <main className="min-h-screen px-4 py-4 sm:px-6 sm:py-6 md:ml-64 md:px-12 md:py-10">
-        <div className="hidden md:flex justify-end items-center gap-3 mb-6">
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="px-3 py-2 rounded border text-xs inline-flex"
-            style={{ borderColor: 'var(--border)' }}
-          >
-            {theme === 'dark' ? 'Light mode' : 'Dark mode'}
-          </button>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="inline-flex items-center gap-2 px-3 py-2 rounded border text-xs"
-            style={{ borderColor: 'var(--border)' }}
-          >
-            <LogOut className="w-4 h-4" />
-            Sign out
-          </button>
-        </div>
         <Routes>
           <Route path="/" element={<Navigate to="/shipments" replace />} />
           <Route

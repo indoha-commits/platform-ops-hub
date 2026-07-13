@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useManagerData, type PipelineState } from './data';
 import { ManagerTable } from './ManagerTable';
+import { PageHeader } from '@/app/components/PageHeader';
 
 type TabDef = {
   key: PipelineState | 'all';
@@ -75,14 +76,10 @@ export function PipelinePage() {
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Pipeline</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {loading ? 'Loading…' : `${totalContainerCount} container${totalContainerCount !== 1 ? 's' : ''} tracked`}
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="Pipeline"
+        subtitle={loading ? 'Loading…' : `${totalContainerCount} container${totalContainerCount !== 1 ? 's' : ''} tracked`}
+      />
 
       {/* Tabs */}
       <div className="flex items-center gap-1 overflow-x-auto pb-1 border-b" style={{ borderColor: 'var(--border)' }}>

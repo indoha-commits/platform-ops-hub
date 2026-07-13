@@ -17,6 +17,7 @@ import {
   type ManagerReceivableRow,
   type ManagerShipmentsRow,
 } from '@/app/api/ops';
+import { PageHeader } from '@/app/components/PageHeader';
 
 /* ── helpers ── */
 function money(n: number) {
@@ -307,10 +308,7 @@ export function ReceivablesPage() {
 
       {/* ── Header ── */}
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Receivables</h1>
-          <p className="text-sm text-muted-foreground mt-1">Daily control — who owes you, how much, next billing</p>
-        </div>
+        <PageHeader title="Receivables" subtitle="Daily control — who owes you, how much, next billing" />
         <button
           type="button" onClick={reload} disabled={loading}
           className="shrink-0 p-2 rounded-lg border hover:bg-muted transition-colors disabled:opacity-40"
@@ -328,9 +326,9 @@ export function ReceivablesPage() {
           { label: 'Outstanding', value: totals.outstanding, cls: 'text-red-600 dark:text-red-400', border: 'border-red-500/20' },
           { label: 'Active billing cycles', value: pendingCyclesCount, cls: pendingCyclesCount > 0 ? 'text-amber-600 dark:text-amber-400' : '', isCycles: true, border: pendingCyclesCount > 0 ? 'border-amber-400/40' : '' },
         ].map((k) => (
-          <div key={k.label} className={`bg-card border rounded-xl px-4 py-3 ${k.border ?? ''}`} style={{ borderColor: k.border ? undefined : 'var(--border)' }}>
+          <div key={k.label} className={`bg-card border rounded-xl px-5 py-4 ${k.border ?? ''}`} style={{ borderColor: k.border ? undefined : 'var(--border)' }}>
             <div className="text-xs text-muted-foreground">{k.label}</div>
-            <div className={`text-xl font-bold tabular-nums ${k.cls}`}>{money(k.value)}</div>
+            <div className={`text-2xl font-bold tabular-nums ${k.cls}`}>{money(k.value)}</div>
             <div className="text-xs text-muted-foreground mt-0.5">{k.isCycles ? 'pending' : 'RWF'}</div>
           </div>
         ))}

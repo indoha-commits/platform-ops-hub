@@ -237,6 +237,26 @@ export async function openInvoiceWindow(paymentId: string): Promise<void> {
   if (!win) throw new Error('popup_blocked');
 }
 
+export type BillingInfo = {
+  pricing: { tier: string; cap: number | null; overageRate: number | null; basePrice: number };
+  currentUsage: { cargo_count: number; document_count: number; event_count: number; ai_conversation_count: number };
+  invoices: Array<{
+    id: string; invoice_number: string; amount: number; status: string;
+    issued_at: string; due_at: string; metadata: Record<string, unknown>;
+  }>;
+};
+
+export async function getManagerBilling(): Promise<BillingInfo> {
+  return await fetchJson<BillingInfo>('/ops/manager/billing');
+}
+
+export async function changeManagerTier(tier: string): Promise<{ ok: true; tier: string }> {
+  return await fetchJson('/ops/manager/billing/change-tier', {
+    method: 'POST',
+    body: JSON.stringify({ tier }),
+  });
+}
+
 export async function sendPaymentInvoice(
   paymentId: string,
   email: string,

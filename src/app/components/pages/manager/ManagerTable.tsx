@@ -109,18 +109,18 @@ export function ManagerTable({ rows }: { rows: ManagerContainer[] }) {
                   </span>
                     <VerifBadge status={r.verification_status} />
                   </div>
-                  <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground flex-wrap">
-                    <span className="font-medium text-foreground/70">{r.client_name}</span>
+                  <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground/80 flex-wrap">
+                    <span className="font-medium text-muted-foreground">{r.client_name}</span>
                     {r.bill_of_lading && (
                       <>
-                        <span className="opacity-40">·</span>
-                        <span className="font-mono opacity-70">{r.bill_of_lading}</span>
+                        <span className="text-muted-foreground/40">·</span>
+                        <span className="font-mono text-muted-foreground/60">{r.bill_of_lading}</span>
                       </>
                     )}
                     {r.category && (
                       <>
-                        <span className="opacity-40">·</span>
-                        <span>{r.category}</span>
+                        <span className="text-muted-foreground/40">·</span>
+                        <span className="text-muted-foreground/60">{r.category}</span>
                       </>
                     )}
                   </div>
@@ -152,7 +152,7 @@ export function ManagerTable({ rows }: { rows: ManagerContainer[] }) {
                 {/* Right: ETA + chevron */}
                 <div className="flex flex-col items-end gap-2 shrink-0 self-center">
                   <EtaChip days={r.days_to_release} />
-                  <ChevronRight className="size-4 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
+                  <ChevronRight className="size-4 text-muted-foreground/70 group-hover:text-muted-foreground transition-colors" />
                 </div>
               </div>
 

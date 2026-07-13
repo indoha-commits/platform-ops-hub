@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useManagerData, SUCOMO_STAGES, toSucomoStage, eventTypeLabel, formatRelativeTime } from './data';
 import { Button } from '@/app/components/ui/button';
+import { PageHeader } from '@/app/components/PageHeader';
 
 // ── SUCOMO milestone colours ───────────────────────────────────────────────────
 const STAGE_COLORS: Record<string, { bar: string; badge: string; text: string; dot: string }> = {
@@ -116,10 +117,7 @@ export function ActionPanelPage() {
 
       {/* Page header */}
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Operations Overview</h1>
-          <p className="text-sm text-muted-foreground mt-1">{today}</p>
-        </div>
+        <PageHeader title="Operations Overview" subtitle={today} />
         <Button variant="outline" size="sm" onClick={() => navigate('/pipeline')} className="shrink-0">
           <TrendingUp className="size-4" />
           Full pipeline
@@ -288,7 +286,7 @@ export function ActionPanelPage() {
                 <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${c.iconBg}`}>
                   <span className={c.iconColor}>{icon}</span>
                 </div>
-                <div className={`text-3xl font-bold tabular-nums ${c.val}`}>{loading ? '—' : value}</div>
+                <div className={`text-2xl font-bold tabular-nums ${c.val}`}>{loading ? '—' : value}</div>
               </div>
               <div>
                 <div className="font-semibold text-sm leading-snug">{label}</div>
@@ -318,7 +316,8 @@ export function ActionPanelPage() {
             <button
               type="button"
               onClick={() => navigate('/monitoring')}
-              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
+              className="text-xs font-medium flex items-center gap-1.5 px-3 py-2 rounded-lg border hover:bg-muted/40 transition-colors"
+              style={{ borderColor: 'var(--border)' }}
             >
               View all <ArrowRight className="size-3" />
             </button>

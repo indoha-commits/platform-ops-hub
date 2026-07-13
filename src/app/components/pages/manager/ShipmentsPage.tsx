@@ -4,6 +4,7 @@ import { getManagerShipments, type ManagerShipmentsRow } from '@/app/api/ops';
 import { ContainerDetailDrawer } from './ContainerDetailDrawer';
 import type { ManagerContainer } from './data';
 import { Button } from '@/app/components/ui/button';
+import { PageHeader } from '@/app/components/PageHeader';
 
 function money(n: number) {
   const v = Number.isFinite(n) ? n : 0;
@@ -13,7 +14,7 @@ function money(n: number) {
 /** Render a cell value: zero → dimmed dash, positive → formatted number */
 function cellMoney(raw: number | null | undefined) {
   const v = Number(raw ?? 0);
-  if (!v) return <span className="text-muted-foreground/50">—</span>;
+  if (!v) return <span className="text-muted-foreground/70">—</span>;
   return <span>{money(v)}</span>;
 }
 
@@ -72,10 +73,7 @@ export function ShipmentsPage() {
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Shipments</h1>
-          <p className="text-sm text-muted-foreground mt-1">1 row = 1 shipment (BoL). Not grouped by client.</p>
-        </div>
+        <PageHeader title="Shipments" subtitle="1 row = 1 shipment (BoL). Not grouped by client." />
         <Button variant="outline" size="sm" className="shrink-0">
           <Calendar className="size-4" />
           Export
@@ -97,44 +95,44 @@ export function ShipmentsPage() {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {/* Revenue */}
-          <div className="bg-card border rounded-xl px-4 py-3" style={{ borderColor: 'var(--border)' }}>
+          <div className="bg-card border rounded-xl px-5 py-4" style={{ borderColor: 'var(--border)' }}>
             <div className="text-xs text-muted-foreground mb-1">Revenue</div>
             {totals.revenue === 0
-              ? <div className="text-xl font-bold text-muted-foreground/40">—</div>
-              : <div className="text-xl font-bold tabular-nums">{money(totals.revenue)}</div>
+              ? <div className="text-2xl font-bold text-muted-foreground/40">—</div>
+              : <div className="text-2xl font-bold tabular-nums">{money(totals.revenue)}</div>
             }
           </div>
           {/* Cost */}
-          <div className="bg-card border rounded-xl px-4 py-3" style={{ borderColor: 'var(--border)' }}>
+          <div className="bg-card border rounded-xl px-5 py-4" style={{ borderColor: 'var(--border)' }}>
             <div className="text-xs text-muted-foreground mb-1">Cost</div>
             {totals.cost === 0
-              ? <div className="text-xl font-bold text-muted-foreground/40">—</div>
-              : <div className="text-xl font-bold tabular-nums">{money(totals.cost)}</div>
+              ? <div className="text-2xl font-bold text-muted-foreground/40">—</div>
+              : <div className="text-2xl font-bold tabular-nums">{money(totals.cost)}</div>
             }
           </div>
           {/* Profit */}
-          <div className="bg-card border rounded-xl px-4 py-3" style={{ borderColor: 'var(--border)' }}>
+          <div className="bg-card border rounded-xl px-5 py-4" style={{ borderColor: 'var(--border)' }}>
             <div className="text-xs text-muted-foreground mb-1">Profit</div>
             {totals.profit === 0
-              ? <div className="text-xl font-bold text-muted-foreground/40">—</div>
+              ? <div className="text-2xl font-bold text-muted-foreground/40">—</div>
               : (
-                <div className={`text-xl font-bold tabular-nums ${totals.profit > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                <div className={`text-2xl font-bold tabular-nums ${totals.profit > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
                   {money(totals.profit)}
                 </div>
               )
             }
           </div>
           {/* Outstanding */}
-          <div className="bg-card border rounded-xl px-4 py-3" style={{ borderColor: 'var(--border)' }}>
+          <div className="bg-card border rounded-xl px-5 py-4" style={{ borderColor: 'var(--border)' }}>
             <div className="text-xs text-muted-foreground mb-1">Outstanding</div>
             {totals.outstanding === 0
               ? (
                 <div className="flex items-center gap-1.5">
                   <CheckCircle2 className="size-4 text-emerald-500 shrink-0" />
-                  <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400">Settled</div>
+                  <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">Settled</div>
                 </div>
               )
-              : <div className="text-xl font-bold tabular-nums text-red-600 dark:text-red-400">{money(totals.outstanding)}</div>
+              : <div className="text-2xl font-bold tabular-nums text-red-600 dark:text-red-400">{money(totals.outstanding)}</div>
             }
           </div>
         </div>
@@ -196,23 +194,23 @@ export function ShipmentsPage() {
                       style={{ borderColor: 'var(--border)' }}
                       onClick={() => setSelectedContainer(null)}
                     >
-                      <td className="px-5 py-3 font-mono">{r.shipment_ref}</td>
-                      <td className="px-5 py-3">{r.client_name}</td>
-                      {hasAnyDmc && <td className="px-5 py-3">{r.dmc ?? '—'}</td>}
-                      <td className="px-5 py-3">
+                      <td className="px-5 py-3.5 font-mono">{r.shipment_ref}</td>
+                      <td className="px-5 py-3.5">{r.client_name}</td>
+                      {hasAnyDmc && <td className="px-5 py-3.5">{r.dmc ?? '—'}</td>}
+                      <td className="px-5 py-3.5">
                         <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
                           {r.service_scope === 'CLEARING_ONLY' ? 'Clearing only' : 'Logistics + Clearing'}
                         </span>
                       </td>
-                      {hasAnyFin && <td className="px-5 py-3 tabular-nums">{cellMoney(r.revenue)}</td>}
-                      {hasAnyFin && <td className="px-5 py-3 tabular-nums">{cellMoney(r.cost)}</td>}
-                      {hasAnyFin && <td className="px-5 py-3 tabular-nums font-semibold">{cellMoney(r.profit)}</td>}
-                      <td className="px-5 py-3">
+                      {hasAnyFin && <td className="px-5 py-3.5 tabular-nums">{cellMoney(r.revenue)}</td>}
+                      {hasAnyFin && <td className="px-5 py-3.5 tabular-nums">{cellMoney(r.cost)}</td>}
+                      {hasAnyFin && <td className="px-5 py-3.5 tabular-nums font-semibold">{cellMoney(r.profit)}</td>}
+                      <td className="px-5 py-3.5">
                         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${chip.className}`}>
                           {chip.label}
                         </span>
                       </td>
-                      <td className="px-5 py-3">
+                      <td className="px-5 py-3.5">
                         <span className={`text-xs inline-flex items-center gap-1 ${statusLabel === 'settled' ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground'}`}>
                           {statusLabel === 'settled' ? <CheckCircle2 className="size-3" /> : <DollarSign className="size-3" />}
                           {statusLabel}

@@ -21,6 +21,7 @@ import {
   type ManagerPaymentRow,
 } from '@/app/api/ops';
 import { fetchJson } from '@/app/api/client';
+import { PageHeader } from '@/app/components/PageHeader';
 
 /* ── helpers ── */
 function money(n: number) {
@@ -490,10 +491,7 @@ export function PaymentsPage() {
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Payments</h1>
-          <p className="text-sm text-muted-foreground mt-1">Cash control ledger — money → shipment → client</p>
-        </div>
+        <PageHeader title="Payments" subtitle="Cash control ledger — money → shipment → client" />
         <button
           type="button"
           onClick={() => setDrawerOpen(true)}
@@ -504,11 +502,11 @@ export function PaymentsPage() {
       </div>
 
       {/* KPI */}
-      <div className="bg-card border rounded-xl px-4 py-3 flex items-center justify-between" style={{ borderColor: 'var(--border)' }}>
+      <div className="bg-card border rounded-xl px-5 py-4 flex items-center justify-between" style={{ borderColor: 'var(--border)' }}>
         <div className="text-xs text-muted-foreground flex items-center gap-2">
           <CreditCard className="size-4" /> Total (filtered)
         </div>
-        <div className="text-xl font-bold tabular-nums">{money(total)} <span className="text-sm font-normal text-muted-foreground">RWF</span></div>
+        <div className="text-2xl font-bold tabular-nums">{money(total)} <span className="text-sm font-normal text-muted-foreground">RWF</span></div>
       </div>
 
       {/* Search */}
@@ -554,18 +552,18 @@ export function PaymentsPage() {
               <tbody>
                 {filtered.map((r) => (
                   <tr key={r.id} className="border-t hover:bg-muted/40 transition-colors" style={{ borderColor: 'var(--border)' }}>
-                    <td className="px-5 py-3 font-mono text-xs">{r.invoice_number ?? <span className="opacity-40">{r.id.slice(0, 8)}…</span>}</td>
-                    <td className="px-5 py-3 font-medium">{r.client_name}</td>
-                    <td className="px-5 py-3 text-xs text-muted-foreground">{r.dmc ?? '—'}</td>
-                    <td className="px-5 py-3 font-mono text-xs">{r.shipment_ref ?? '—'}</td>
-                    <td className="px-5 py-3 tabular-nums font-semibold text-right">{money(Number(r.amount || 0))}</td>
-                    <td className="px-5 py-3 text-xs">{r.paid_at}</td>
-                    <td className="px-5 py-3 text-xs text-muted-foreground">{r.next_billing_date ?? '—'}</td>
-                    <td className="px-5 py-3">
+                    <td className="px-5 py-3.5 font-mono text-xs">{r.invoice_number ?? <span className="opacity-40">{r.id.slice(0, 8)}…</span>}</td>
+                    <td className="px-5 py-3.5 font-medium">{r.client_name}</td>
+                    <td className="px-5 py-3.5 text-xs text-muted-foreground">{r.dmc ?? '—'}</td>
+                    <td className="px-5 py-3.5 font-mono text-xs">{r.shipment_ref ?? '—'}</td>
+                    <td className="px-5 py-3.5 tabular-nums font-semibold text-right">{money(Number(r.amount || 0))}</td>
+                    <td className="px-5 py-3.5 text-xs">{r.paid_at}</td>
+                    <td className="px-5 py-3.5 text-xs text-muted-foreground">{r.next_billing_date ?? '—'}</td>
+                    <td className="px-5 py-3.5">
                       <span className="text-xs bg-muted rounded px-2 py-0.5">{fmtMethod(r.method)}</span>
                     </td>
                     {/* Email send */}
-                    <td className="px-4 py-3 text-center">
+                    <td className="px-4 py-3.5 text-center">
                       {r.email_sent ? (
                         <span className="inline-flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
                           <Check className="size-3" /> Sent
@@ -583,7 +581,7 @@ export function PaymentsPage() {
                       )}
                     </td>
                     {/* Download */}
-                    <td className="px-4 py-3 text-center">
+                    <td className="px-4 py-3.5 text-center">
                       <button
                         type="button"
                         onClick={() => handleDownload(r)}

@@ -16,6 +16,7 @@ import {
 import { useManagerData, toDays } from './data';
 import { ContainerDetailDrawer } from './ContainerDetailDrawer';
 import type { ManagerContainer } from './data';
+import { PageHeader } from '@/app/components/PageHeader';
 
 type RiskCategory = 'overdue' | 'missing_docs' | 'no_activity' | 'failed_validation';
 
@@ -177,12 +178,7 @@ export function RiskCenterPage() {
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Risk Center</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Flagged containers requiring attention
-          </p>
-        </div>
+        <PageHeader title="Risk Center" subtitle="Flagged containers requiring attention" />
         <div className="flex items-center gap-3">
           {snoozedCount > 0 && (
             <button
@@ -197,7 +193,8 @@ export function RiskCenterPage() {
           <button
             type="button"
             onClick={() => navigate('/pipeline')}
-            className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
+            className="text-xs font-medium flex items-center gap-1.5 px-3 py-2 rounded-lg border hover:bg-muted/40 transition-colors"
+            style={{ borderColor: 'var(--border)' }}
           >
             Full pipeline <ArrowRight className="size-3" />
           </button>
@@ -230,7 +227,7 @@ export function RiskCenterPage() {
               const meta = CATEGORY_META[cat];
               const count = grouped.get(cat)?.length ?? 0;
               return (
-                <div key={cat} className={`rounded-xl border px-4 py-3 ${count > 0 ? meta.bg + ' ' + meta.border : 'bg-card border-muted opacity-50'}`}>
+                <div key={cat} className={`rounded-xl border px-5 py-4 ${count > 0 ? meta.bg + ' ' + meta.border : 'bg-card border-muted opacity-50'}`}>
                   <div className={`flex items-center gap-1.5 mb-1 ${count > 0 ? meta.textColor : 'text-muted-foreground'}`}>
                     {meta.icon}
                     <span className="text-xs font-medium truncate">{meta.label}</span>
@@ -276,7 +273,7 @@ export function RiskCenterPage() {
                             <Package className="size-3.5 text-muted-foreground" />
                           </div>
 
-                          {/* Info */}
+                          {/* Info + actions (stacked) */}
                           <div className="flex-1 min-w-0">
                             {/* ID line */}
                             <div className="flex items-center gap-2 flex-wrap">
@@ -348,62 +345,62 @@ export function RiskCenterPage() {
                                 </button>
                               </div>
                             )}
-                          </div>
 
-                          {/* Right side: actions */}
-                          <div className="flex items-center gap-2 shrink-0 ml-auto flex-wrap justify-end">
-                            {/* View */}
-                            <button
-                              type="button"
-                              onClick={() => setSelected(item.container)}
-                              className="text-xs px-2.5 py-1.5 rounded-md border text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
-                              style={{ borderColor: 'var(--border)' }}
-                              title="Open container details"
-                            >
-                              View
-                            </button>
-
-                            {/* Assign */}
-                            {!isAssigning && (
+                            {/* Actions row (below identity) */}
+                            <div className="mt-2 flex items-center gap-2 flex-wrap">
+                              {/* View */}
                               <button
                                 type="button"
-                                onClick={() => startAssign(item.cargo_id)}
-                                className="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-md border hover:bg-sky-500/10 hover:border-sky-500/40 hover:text-sky-700 dark:hover:text-sky-400 transition-colors"
+                                onClick={() => setSelected(item.container)}
+                                className="inline-flex items-center justify-center text-xs px-3 min-h-[44px] rounded-md border text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
                                 style={{ borderColor: 'var(--border)' }}
-                                title="Assign to team member"
+                                title="Open container details"
                               >
-                                <UserPlus className="size-3" />
-                                Assign
+                                View
                               </button>
-                            )}
 
-                            {/* Acknowledge */}
-                            <button
-                              type="button"
-                              onClick={() => acknowledge(item.cargo_id)}
-                              className={`inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-md border transition-colors ${
-                                isAcknowledged
-                                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-400'
-                                  : 'hover:bg-emerald-500/10 hover:border-emerald-500/30 hover:text-emerald-700 dark:hover:text-emerald-400'
-                              }`}
-                              style={isAcknowledged ? {} : { borderColor: 'var(--border)' }}
-                              title={isAcknowledged ? 'Unacknowledge' : 'Acknowledge'}
-                            >
-                              <CheckCircle2 className="size-3" />
-                              {isAcknowledged ? 'Ack\u2019d' : 'Ack'}
-                            </button>
+                              {/* Assign */}
+                              {!isAssigning && (
+                                <button
+                                  type="button"
+                                  onClick={() => startAssign(item.cargo_id)}
+                                  className="inline-flex items-center justify-center gap-1 text-xs px-3 min-h-[44px] rounded-md border hover:bg-sky-500/10 hover:border-sky-500/40 hover:text-sky-700 dark:hover:text-sky-400 transition-colors"
+                                  style={{ borderColor: 'var(--border)' }}
+                                  title="Assign to team member"
+                                >
+                                  <UserPlus className="size-3" />
+                                  Assign
+                                </button>
+                              )}
 
-                            {/* Snooze */}
-                            <button
-                              type="button"
-                              onClick={() => snooze(item.cargo_id)}
-                              className="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-md border hover:bg-muted/50 transition-colors text-muted-foreground hover:text-foreground"
-                              style={{ borderColor: 'var(--border)' }}
-                              title="Snooze — hide from list this session"
-                            >
-                              <BellOff className="size-3" />
-                              Snooze
-                            </button>
+                              {/* Acknowledge */}
+                              <button
+                                type="button"
+                                onClick={() => acknowledge(item.cargo_id)}
+                                className={`inline-flex items-center justify-center gap-1 text-xs px-3 min-h-[44px] rounded-md border transition-colors ${
+                                  isAcknowledged
+                                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-400'
+                                    : 'hover:bg-emerald-500/10 hover:border-emerald-500/30 hover:text-emerald-700 dark:hover:text-emerald-400'
+                                }`}
+                                style={isAcknowledged ? {} : { borderColor: 'var(--border)' }}
+                                title={isAcknowledged ? 'Unacknowledge' : 'Acknowledge'}
+                              >
+                                <CheckCircle2 className="size-3" />
+                                {isAcknowledged ? 'Ack\u2019d' : 'Ack'}
+                              </button>
+
+                              {/* Snooze */}
+                              <button
+                                type="button"
+                                onClick={() => snooze(item.cargo_id)}
+                                className="inline-flex items-center justify-center gap-1 text-xs px-3 min-h-[44px] rounded-md border hover:bg-muted/50 transition-colors text-muted-foreground hover:text-foreground"
+                                style={{ borderColor: 'var(--border)' }}
+                                title="Snooze — hide from list this session"
+                              >
+                                <BellOff className="size-3" />
+                                Snooze
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>

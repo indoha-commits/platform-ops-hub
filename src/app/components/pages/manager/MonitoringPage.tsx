@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useManagerData, type ManagerContainer } from './data';
 import { ManagerTable } from './ManagerTable';
+import { PageHeader } from '@/app/components/PageHeader';
 
 type SortKey = 'cargo_id' | 'client_name' | 'days_to_release' | 'latest_event_time' | 'priority_level';
 type SortDir = 'asc' | 'desc';
@@ -102,10 +103,7 @@ export function MonitoringPage() {
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Monitoring</h1>
-          <p className="text-sm text-muted-foreground mt-1">Live company-wide container overview</p>
-        </div>
+        <PageHeader title="Monitoring" subtitle="Live company-wide container overview" />
         <div className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
           <RefreshCw className="size-3.5 animate-spin [animation-duration:3s]" />
           <span>Live · refreshes every 30s</span>
@@ -114,28 +112,28 @@ export function MonitoringPage() {
 
       {/* Stats row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-card border rounded-xl px-4 py-3" style={{ borderColor: 'var(--border)' }}>
+        <div className="bg-card border rounded-xl px-5 py-4" style={{ borderColor: 'var(--border)' }}>
           <div className="flex items-center gap-2 mb-1">
             <Activity className="size-3.5 text-muted-foreground" />
             <span className="text-xs text-muted-foreground">Total active</span>
           </div>
           <div className="text-2xl font-bold tabular-nums">{loading ? '—' : rows.length}</div>
         </div>
-        <div className="bg-card border border-red-500/20 rounded-xl px-4 py-3">
+        <div className="bg-card border border-red-500/20 rounded-xl px-5 py-4">
           <div className="flex items-center gap-2 mb-1">
             <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
             <span className="text-xs text-muted-foreground">Action needed</span>
           </div>
           <div className="text-2xl font-bold tabular-nums text-red-600 dark:text-red-400">{loading ? '—' : redCount}</div>
         </div>
-        <div className="bg-card border border-amber-500/20 rounded-xl px-4 py-3">
+        <div className="bg-card border border-amber-500/20 rounded-xl px-5 py-4">
           <div className="flex items-center gap-2 mb-1">
             <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
             <span className="text-xs text-muted-foreground">Prepare</span>
           </div>
           <div className="text-2xl font-bold tabular-nums text-amber-600 dark:text-amber-400">{loading ? '—' : yellowCount}</div>
         </div>
-        <div className="bg-card border border-emerald-500/20 rounded-xl px-4 py-3">
+        <div className="bg-card border border-emerald-500/20 rounded-xl px-5 py-4">
           <div className="flex items-center gap-2 mb-1">
             <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
             <span className="text-xs text-muted-foreground">Stable</span>

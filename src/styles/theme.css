@@ -63,7 +63,7 @@
   --secondary: #1c1d20;
   --secondary-foreground: #c8ccd6;
   --muted: #141516;
-  --muted-foreground: #5a5d66;
+  --muted-foreground: #80848f;
   --accent: #5e6ad2;
   --accent-foreground: #ffffff;
   --destructive: #ef4444;
@@ -191,6 +191,13 @@ input[type="date"].date-white-icon::-webkit-calendar-picker-indicator {
     font-size: var(--text-base);
     font-weight: var(--font-weight-medium);
     line-height: 1.5;
+  }
+
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  a:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
 
   input {
