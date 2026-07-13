@@ -183,8 +183,8 @@ export function ActionPanelPage() {
         ) : error ? (
             <div className="px-5 py-6 text-sm text-destructive">{error}</div>
           ) : (
-            // Rendered highest score first (score 7 → 1, matching the SUCOMO chart)
-            [...sucomo].sort((a, b) => b.score - a.score).map((stage) => {
+            // Rendered lowest score first (score 1 → 7, matching natural progression)
+            [...sucomo].sort((a, b) => a.score - b.score).map((stage) => {
               const colors = STAGE_COLORS[stage.id];
               const pct = total === 0 ? 0 : Math.round((stage.count / total) * 100);
               const barWidth = total === 0 ? 0 : Math.round((stage.count / maxCount) * 100);
@@ -213,13 +213,15 @@ export function ActionPanelPage() {
                         {stage.count}
                       </span>
                     </div>
-                    {/* Progress bar */}
-                    <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all duration-500 ${colors.bar}`}
-                        style={{ width: `${barWidth}%` }}
-                      />
-                    </div>
+                    {/* Progress bar — hidden when 0 */}
+                    {stage.count > 0 && (
+                      <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${colors.bar}`}
+                          style={{ width: `${barWidth}%` }}
+                        />
+                      </div>
+                    )}
                   </div>
 
                   {/* % label */}
@@ -304,34 +306,6 @@ export function ActionPanelPage() {
           );
         })}
       </div>
-
-      {/* ── Quick stats strip ──────────────────────────────────────────────────── */}
-      {!loading && !error && (
-        <div className="grid grid-cols-4 gap-2 sm:grid-cols-7">
-          {sucomo.map((stage) => {
-            const colors = STAGE_COLORS[stage.id];
-            return (
-              <div
-                key={stage.id}
-                className="bg-muted/40 rounded-lg px-2 py-2.5 text-center cursor-pointer hover:bg-muted/70 transition-colors"
-                onClick={() => navigate('/pipeline')}
-                title={stage.label}
-              >
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <div className={`w-1.5 h-1.5 rounded-full ${colors.dot}`} />
-                  <div className="text-[10px] text-muted-foreground font-bold">{stage.score}</div>
-                </div>
-                <div className={`text-lg font-bold tabular-nums leading-none ${stage.count > 0 ? colors.text : 'text-muted-foreground/40'}`}>
-                  {stage.count}
-                </div>
-                <div className="text-[9px] text-muted-foreground mt-1 leading-tight line-clamp-2">
-                  {stage.label}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
 
       {/* ── Recent activity ────────────────────────────────────────────────────── */}
       {!loading && !error && recentActivity.length > 0 && (

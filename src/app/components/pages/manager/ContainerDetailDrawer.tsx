@@ -121,21 +121,21 @@ export function ContainerDetailDrawer({ container, open, onClose }: ContainerDet
               <div className="px-6 py-4 grid grid-cols-2 gap-3 border-b" style={{ borderColor: 'var(--border)' }}>
                 <MetaItem icon={<User className="size-3.5" />} label="Client" value={container.client_name} />
                 <MetaItem icon={<FileText className="size-3.5" />} label="Category" value={container.category ?? '—'} />
-                <MetaItem icon={<Anchor className="size-3.5" />} label="Vessel" value={container.vessel ?? '—'} />
+                <MetaItem icon={<Anchor className="size-3.5" />} label="Vessel" value={container.vessel || (progress === 100 ? 'Arrived' : '—')} />
                 <MetaItem
                   icon={<Calendar className="size-3.5" />}
-                  label="ETA"
+                  label={progress === 100 ? 'Arrived' : 'ETA'}
                   value={
                     container.expected_release_date
                       ? new Date(container.expected_release_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-                      : '—'
+                      : progress === 100 ? 'Completed' : '—'
                   }
                 />
                 {container.origin && (
-                  <MetaItem icon={<MapPin className="size-3.5" />} label="Origin" value={container.origin} />
+                  <MetaItem icon={<MapPin className="size-3.5" />} label="Origin" value={container.origin.replace(/^AGENT:\s*/i, '').replace(/,\s*/g, ', ')} />
                 )}
                 {container.destination && (
-                  <MetaItem icon={<MapPin className="size-3.5" />} label="Destination" value={container.destination} />
+                  <MetaItem icon={<MapPin className="size-3.5" />} label="Destination" value={container.destination.replace(/^AGENT:\s*/i, '').replace(/,\s*/g, ', ')} />
                 )}
               </div>
 
@@ -144,10 +144,10 @@ export function ContainerDetailDrawer({ container, open, onClose }: ContainerDet
                 <div className="px-6 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
                   <div className="flex items-center gap-2 text-sm">
                     <Ship className="size-4 text-muted-foreground" />
-                    <span className="font-medium">{container.origin ?? '?'}</span>
+                    <span className="font-medium">{container.origin?.replace(/^AGENT:\s*/i, '').replace(/,\s*/g, ', ') ?? '?'}</span>
                     <ArrowRight className="size-4 text-muted-foreground" />
-                    <span className="font-medium">{container.destination ?? '?'}</span>
-                    {container.route && (
+                    <span className="font-medium">{container.destination?.replace(/^AGENT:\s*/i, '').replace(/,\s*/g, ', ') ?? '?'}</span>
+                    {container.route && !container.route.toLowerCase().includes('delivery of the goods') && (
                       <span className="text-muted-foreground text-xs">via {container.route}</span>
                     )}
                   </div>

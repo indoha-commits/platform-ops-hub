@@ -29,7 +29,7 @@ const TABS: TabDef[] = [
 ];
 
 export function PipelinePage() {
-  const { loading, error, rows } = useManagerData();
+  const { loading, error, rows, totalContainerCount } = useManagerData();
   const location = useLocation();
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
@@ -79,7 +79,7 @@ export function PipelinePage() {
         <div>
           <h1 className="text-2xl font-bold">Pipeline</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {loading ? 'Loading…' : `${rows.length} container${rows.length !== 1 ? 's' : ''} tracked`}
+            {loading ? 'Loading…' : `${totalContainerCount} container${totalContainerCount !== 1 ? 's' : ''} tracked`}
           </p>
         </div>
       </div>

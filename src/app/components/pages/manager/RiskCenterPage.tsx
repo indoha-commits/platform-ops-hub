@@ -63,13 +63,6 @@ const CATEGORY_META: Record<
   },
 };
 
-const PRIORITY_FOR_CATEGORY: Record<RiskCategory, { label: string; className: string }> = {
-  overdue:           { label: 'High',   className: 'bg-red-500/15 text-red-700 dark:text-red-400' },
-  failed_validation: { label: 'High',   className: 'bg-red-500/15 text-red-700 dark:text-red-400' },
-  missing_docs:      { label: 'Medium', className: 'bg-amber-500/15 text-amber-700 dark:text-amber-400' },
-  no_activity:       { label: 'Low',    className: 'bg-muted text-muted-foreground' },
-};
-
 export function RiskCenterPage() {
   const { loading, error, rows } = useManagerData();
   const navigate = useNavigate();
@@ -138,12 +131,13 @@ export function RiskCenterPage() {
     const map = new Map<RiskCategory, RiskItem[]>();
     for (const item of riskItems) {
       if (!showSnoozed && snoozed.has(item.cargo_id)) continue;
+      if (acknowledged.has(item.cargo_id)) continue;
       const list = map.get(item.category) ?? [];
       list.push(item);
       map.set(item.category, list);
     }
     return map;
-  }, [riskItems, snoozed, showSnoozed]);
+  }, [riskItems, snoozed, showSnoozed, acknowledged]);
 
   const totalVisible = useMemo(() =>
     Array.from(grouped.values()).reduce((s, a) => s + a.length, 0),
@@ -236,12 +230,12 @@ export function RiskCenterPage() {
               const meta = CATEGORY_META[cat];
               const count = grouped.get(cat)?.length ?? 0;
               return (
-                <div key={cat} className={`rounded-xl border px-4 py-3 ${meta.bg} ${meta.border}`}>
-                  <div className={`flex items-center gap-1.5 mb-1 ${meta.textColor}`}>
+                <div key={cat} className={`rounded-xl border px-4 py-3 ${count > 0 ? meta.bg + ' ' + meta.border : 'bg-card border-muted opacity-50'}`}>
+                  <div className={`flex items-center gap-1.5 mb-1 ${count > 0 ? meta.textColor : 'text-muted-foreground'}`}>
                     {meta.icon}
                     <span className="text-xs font-medium truncate">{meta.label}</span>
                   </div>
-                  <div className={`text-2xl font-bold tabular-nums ${meta.textColor}`}>{count}</div>
+                  <div className={`text-2xl font-bold tabular-nums ${count > 0 ? meta.textColor : 'text-muted-foreground/40'}`}>{count}</div>
                 </div>
               );
             })}
@@ -252,7 +246,6 @@ export function RiskCenterPage() {
             const items = grouped.get(cat);
             if (!items || items.length === 0) return null;
             const meta = CATEGORY_META[cat];
-            const priority = PRIORITY_FOR_CATEGORY[cat];
             return (
               <div key={cat} className={`border rounded-xl overflow-hidden ${meta.border}`}>
                 {/* Group header */}
@@ -357,13 +350,8 @@ export function RiskCenterPage() {
                             )}
                           </div>
 
-                          {/* Right side: priority chip + actions */}
+                          {/* Right side: actions */}
                           <div className="flex items-center gap-2 shrink-0 ml-auto flex-wrap justify-end">
-                            {/* Priority */}
-                            <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${priority.className}`}>
-                              {priority.label}
-                            </span>
-
                             {/* View */}
                             <button
                               type="button"

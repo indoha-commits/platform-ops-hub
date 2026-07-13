@@ -106,6 +106,10 @@ export function formatRelativeTime(iso: string | null): string {
   return `${days}d ago`;
 }
 
+export function normalizeClientName(name: string): string {
+  return name.replace(/[_\s]+/g, '').toUpperCase();
+}
+
 export function toDays(targetIso: string | null): number | null {
   if (!targetIso) return null;
   const now = Date.now();
@@ -186,10 +190,14 @@ export function useManagerData() {
     return (registry?.groups ?? []).flatMap((g) =>
       g.cargos.map((c) => {
         const days = toDays(g.expected_arrival_date ?? g.eta ?? null);
+        const validationItem = byCargoId.get(c.cargo_id);
+        const preferredClient = validationItem?.client_name && validationItem.client_name !== 'Unknown'
+          ? validationItem.client_name
+          : g.client_name;
         return {
           cargo_id: c.cargo_id,
           cargo_uuid: c.cargo_uuid,
-          client_name: g.client_name,
+          client_name: normalizeClientName(preferredClient || c.cargo_id),
           client_id: g.client_id,
           bill_of_lading: g.bill_of_lading,
           category: g.category,
@@ -211,5 +219,10 @@ export function useManagerData() {
     );
   }, [registry, validation]);
 
-  return { loading, error, rows };
+  const totalContainerCount = useMemo(
+    () => (registry?.groups ?? []).reduce((sum, g) => sum + g.container_count, 0),
+    [registry],
+  );
+
+  return { loading, error, rows, totalContainerCount };
 }

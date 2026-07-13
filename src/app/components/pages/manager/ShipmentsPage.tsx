@@ -66,6 +66,9 @@ export function ShipmentsPage() {
     return { revenue, cost, profit, outstanding };
   }, [filtered]);
 
+  const hasAnyDmc = useMemo(() => filtered.some((r) => r.dmc), [filtered]);
+  const hasAnyFin = useMemo(() => filtered.some((r) => Number(r.revenue) || Number(r.cost) || Number(r.profit)), [filtered]);
+
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex items-start justify-between gap-4">
@@ -173,11 +176,11 @@ export function ShipmentsPage() {
                 <tr className="text-left text-xs text-muted-foreground">
                   <th className="px-5 py-3">Shipment ID</th>
                   <th className="px-5 py-3">Client</th>
-                  <th className="px-5 py-3">DMC</th>
+                  {hasAnyDmc && <th className="px-5 py-3">DMC</th>}
                   <th className="px-5 py-3">Scope</th>
-                  <th className="px-5 py-3">Revenue</th>
-                  <th className="px-5 py-3">Cost</th>
-                  <th className="px-5 py-3">Profit</th>
+                  {hasAnyFin && <th className="px-5 py-3">Revenue</th>}
+                  {hasAnyFin && <th className="px-5 py-3">Cost</th>}
+                  {hasAnyFin && <th className="px-5 py-3">Profit</th>}
                   <th className="px-5 py-3">Receivable</th>
                   <th className="px-5 py-3">Status</th>
                 </tr>
@@ -185,6 +188,7 @@ export function ShipmentsPage() {
               <tbody>
                 {filtered.map((r) => {
                   const chip = riskChip(Number(r.outstanding_amount || 0), r.due_payment_date ?? null);
+                  const statusLabel = (r.status === 'open' && Number(r.outstanding_amount || 0) <= 0) ? 'settled' : (r.status ?? 'open');
                   return (
                     <tr
                       key={r.shipment_id}
@@ -194,25 +198,24 @@ export function ShipmentsPage() {
                     >
                       <td className="px-5 py-3 font-mono">{r.shipment_ref}</td>
                       <td className="px-5 py-3">{r.client_name}</td>
-                      <td className="px-5 py-3">{r.dmc ?? '—'}</td>
+                      {hasAnyDmc && <td className="px-5 py-3">{r.dmc ?? '—'}</td>}
                       <td className="px-5 py-3">
                         <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
                           {r.service_scope === 'CLEARING_ONLY' ? 'Clearing only' : 'Logistics + Clearing'}
                         </span>
                       </td>
-                      <td className="px-5 py-3 tabular-nums">{cellMoney(r.revenue)}</td>
-                      <td className="px-5 py-3 tabular-nums">{cellMoney(r.cost)}</td>
-                      <td className="px-5 py-3 tabular-nums font-semibold">{cellMoney(r.profit)}</td>
+                      {hasAnyFin && <td className="px-5 py-3 tabular-nums">{cellMoney(r.revenue)}</td>}
+                      {hasAnyFin && <td className="px-5 py-3 tabular-nums">{cellMoney(r.cost)}</td>}
+                      {hasAnyFin && <td className="px-5 py-3 tabular-nums font-semibold">{cellMoney(r.profit)}</td>}
                       <td className="px-5 py-3">
                         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${chip.className}`}>
                           {chip.label}
                         </span>
                       </td>
                       <td className="px-5 py-3">
-                        <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
-                          <DollarSign className="size-3" />
-                          {String(r.status ?? 'open')}
-                          <ArrowRight className="size-3 opacity-40 ml-1" />
+                        <span className={`text-xs inline-flex items-center gap-1 ${statusLabel === 'settled' ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground'}`}>
+                          {statusLabel === 'settled' ? <CheckCircle2 className="size-3" /> : <DollarSign className="size-3" />}
+                          {statusLabel}
                         </span>
                       </td>
                     </tr>
