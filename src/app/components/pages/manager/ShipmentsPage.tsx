@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, Calendar, CheckCircle2, DollarSign, Search, X } from 'lucide-react';
+import { ArrowRight, Calendar, CheckCircle2, DollarSign, FileSpreadsheet, Search, X } from 'lucide-react';
 import { getManagerShipments, type ManagerShipmentsRow } from '@/app/api/ops';
 import { ContainerDetailDrawer } from './ContainerDetailDrawer';
 import type { ManagerContainer } from './data';
@@ -73,7 +73,7 @@ export function ShipmentsPage() {
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex items-start justify-between gap-4">
-        <PageHeader title="Shipments" subtitle="1 row = 1 shipment (BoL). Not grouped by client." />
+        <PageHeader icon={FileSpreadsheet} title="Shipments" subtitle="View and search all shipments by client, DMC, or status" />
         <Button variant="outline" size="sm" className="shrink-0">
           <Calendar className="size-4" />
           Export

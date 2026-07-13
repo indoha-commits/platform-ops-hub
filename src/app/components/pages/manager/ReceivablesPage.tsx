@@ -4,6 +4,7 @@ import {
   CalendarClock,
   CheckCircle2,
   Loader2,
+  Receipt,
   RefreshCw,
   Search,
   X,
@@ -308,7 +309,7 @@ export function ReceivablesPage() {
 
       {/* ── Header ── */}
       <div className="flex items-start justify-between gap-4">
-        <PageHeader title="Receivables" subtitle="Daily control — who owes you, how much, next billing" />
+        <PageHeader icon={Receipt} title="Receivables" subtitle="Track outstanding balances, mark payments, and manage billing cycles" />
         <button
           type="button" onClick={reload} disabled={loading}
           className="shrink-0 p-2 rounded-lg border hover:bg-muted transition-colors disabled:opacity-40"

@@ -8,6 +8,7 @@ import {
   SortDesc,
   X,
 } from 'lucide-react';
+// Activity icon used in header
 import { useManagerData, type ManagerContainer } from './data';
 import { ManagerTable } from './ManagerTable';
 import { PageHeader } from '@/app/components/PageHeader';
@@ -103,7 +104,7 @@ export function MonitoringPage() {
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
-        <PageHeader title="Monitoring" subtitle="Live company-wide container overview" />
+        <PageHeader icon={Activity} title="Monitoring" subtitle="Search, sort, and inspect every container in the system" />
         <div className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
           <RefreshCw className="size-3.5 animate-spin [animation-duration:3s]" />
           <span>Live · refreshes every 30s</span>

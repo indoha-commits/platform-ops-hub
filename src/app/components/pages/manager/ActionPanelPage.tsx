@@ -14,6 +14,7 @@ import {
   Anchor,
   Container,
   MapPin,
+  Radar,
 } from 'lucide-react';
 import { useManagerData, SUCOMO_STAGES, toSucomoStage, eventTypeLabel, formatRelativeTime } from './data';
 import { Button } from '@/app/components/ui/button';
@@ -117,7 +118,7 @@ export function ActionPanelPage() {
 
       {/* Page header */}
       <div className="flex items-start justify-between gap-4">
-        <PageHeader title="Operations Overview" subtitle={today} />
+        <PageHeader icon={Radar} title="Operations Overview" subtitle="Live stage distribution, KPIs, and recent activity at a glance" />
         <Button variant="outline" size="sm" onClick={() => navigate('/pipeline')} className="shrink-0">
           <TrendingUp className="size-4" />
           Full pipeline

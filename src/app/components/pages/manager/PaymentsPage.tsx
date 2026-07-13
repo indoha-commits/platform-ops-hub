@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Banknote,
   Check,
   CreditCard,
   Download,
@@ -491,7 +492,7 @@ export function PaymentsPage() {
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
-        <PageHeader title="Payments" subtitle="Cash control ledger — money → shipment → client" />
+        <PageHeader icon={Banknote} title="Payments" subtitle="Record payments, send invoices, and track cash flow" />
         <button
           type="button"
           onClick={() => setDrawerOpen(true)}

@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
   AlertTriangle,
   Clock,
+  GitBranch,
   Package,
   Search,
   Truck,
@@ -76,9 +77,9 @@ export function PipelinePage() {
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
-      <PageHeader
+      <PageHeader icon={GitBranch}
         title="Pipeline"
-        subtitle={loading ? 'Loading…' : `${totalContainerCount} container${totalContainerCount !== 1 ? 's' : ''} tracked`}
+        subtitle="Track containers by stage — ready to dispatch, in transit, waiting, and more"
       />
 
       {/* Tabs */}

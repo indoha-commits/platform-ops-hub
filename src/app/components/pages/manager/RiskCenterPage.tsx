@@ -178,7 +178,7 @@ export function RiskCenterPage() {
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
-        <PageHeader title="Risk Center" subtitle="Flagged containers requiring attention" />
+        <PageHeader icon={AlertTriangle} title="Risk Center" subtitle="Overdue releases, failed validation, and missing documentation" />
         <div className="flex items-center gap-3">
           {snoozedCount > 0 && (
             <button

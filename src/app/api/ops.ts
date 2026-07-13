@@ -257,6 +257,44 @@ export async function changeManagerTier(tier: string): Promise<{ ok: true; tier:
   });
 }
 
+export type AdminStats = {
+  mrr: number;
+  arr: number;
+  total_tenants: number;
+  active_tenants: number;
+  tier_breakdown: Record<string, number>;
+  current_month: string;
+  total_usage: {
+    cargo_count: number;
+    document_count: number;
+    event_count: number;
+    ai_conversation_count: number;
+  };
+};
+
+export type AdminTenantRow = {
+  id: string;
+  company_name: string;
+  subdomain: string | null;
+  slug: string | null;
+  status: string;
+  pricing_tier: string;
+  shipment_cap: number | null;
+  overage_rate: number | null;
+  usage: number;
+  usage_pct: number | null;
+  estimated_bill: number;
+  created_at: string;
+};
+
+export async function getAdminStats(): Promise<AdminStats> {
+  return await fetchJson<AdminStats>('/ops/admin/stats');
+}
+
+export async function getAdminTenants(): Promise<{ tenants: AdminTenantRow[] }> {
+  return await fetchJson<{ tenants: AdminTenantRow[] }>('/ops/admin/tenants');
+}
+
 export async function sendPaymentInvoice(
   paymentId: string,
   email: string,

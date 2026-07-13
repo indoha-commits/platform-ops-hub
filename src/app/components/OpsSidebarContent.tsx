@@ -2,6 +2,7 @@ import {
   Activity,
   AlertTriangle,
   Banknote,
+  BarChart3,
   CreditCard,
   FileSpreadsheet,
   GitBranch,
@@ -52,6 +53,12 @@ const navGroups: NavGroup[] = [
       { id: 'monitoring', label: 'Monitoring', icon: Activity },
       { id: 'risk-center', label: 'Risk Center', icon: AlertTriangle },
       { id: 'billing', label: 'Billing', icon: CreditCard },
+    ],
+  },
+  {
+    label: 'Admin',
+    items: [
+      { id: 'admin', label: 'Dashboard', icon: BarChart3 },
     ],
   },
 ];

@@ -11,6 +11,7 @@ import { MonitoringPage } from '@/app/components/pages/manager/MonitoringPage';
 import { RiskCenterPage } from '@/app/components/pages/manager/RiskCenterPage';
 import { ShipmentsPage } from '@/app/components/pages/manager/ShipmentsPage';
 import { BillingPage } from '@/app/components/pages/manager/BillingPage';
+import { AdminDashboardPage } from '@/app/components/pages/manager/AdminDashboardPage';
 import { PaymentsPage } from '@/app/components/pages/manager/PaymentsPage';
 import { ReceivablesPage } from '@/app/components/pages/manager/ReceivablesPage';
 
@@ -22,7 +23,8 @@ type ManagerPageId =
   | 'pipeline'
   | 'monitoring'
   | 'risk-center'
-  | 'billing';
+  | 'billing'
+  | 'admin';
 
 const pageToPath: Record<ManagerPageId, string> = {
   shipments: 'shipments',
@@ -33,6 +35,7 @@ const pageToPath: Record<ManagerPageId, string> = {
   monitoring: 'monitoring',
   'risk-center': 'risk-center',
   billing: 'billing',
+  admin: 'admin',
 };
 
 const pathToPage: Record<string, ManagerPageId> = {
@@ -44,6 +47,7 @@ const pathToPage: Record<string, ManagerPageId> = {
   monitoring: 'monitoring',
   'risk-center': 'risk-center',
   billing: 'billing',
+  admin: 'admin',
 };
 
 function requireEnv(name: string): string {
@@ -94,6 +98,8 @@ function ManagerPageRenderer({
       return <RiskCenterPage />;
     case 'billing':
       return <BillingPage />;
+    case 'admin':
+      return <AdminDashboardPage />;
     default:
       return <ShipmentsPage />;
   }
