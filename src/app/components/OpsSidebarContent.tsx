@@ -1,19 +1,16 @@
 import {
   Activity,
-  AlertTriangle,
-  Banknote,
   BarChart3,
-  CreditCard,
-  FileSpreadsheet,
-  GitBranch,
+  Building2,
+  Inbox,
   LogOut,
   Moon,
-  Radar,
-  Receipt,
+  PlusCircle,
   RefreshCw,
   Settings,
   Sun,
   User,
+  Wallet,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -38,27 +35,34 @@ type NavGroup = {
 
 const navGroups: NavGroup[] = [
   {
-    label: 'Finance',
+    label: 'Overview',
     items: [
-      { id: 'shipments', label: 'Shipments', icon: FileSpreadsheet },
-      { id: 'payments', label: 'Payments', icon: Banknote },
-      { id: 'receivables', label: 'Receivables', icon: Receipt },
+      { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
     ],
   },
   {
-    label: 'Operations',
+    label: 'Tenants',
     items: [
-      { id: 'action-panel', label: 'Action Panel', icon: Radar },
-      { id: 'pipeline', label: 'Pipeline', icon: GitBranch },
-      { id: 'monitoring', label: 'Monitoring', icon: Activity },
-      { id: 'risk-center', label: 'Risk Center', icon: AlertTriangle },
-      { id: 'billing', label: 'Billing', icon: CreditCard },
+      { id: 'tenants', label: 'Tenants', icon: Building2 },
     ],
   },
   {
-    label: 'Admin',
+    label: 'Monitoring',
     items: [
-      { id: 'admin', label: 'Dashboard', icon: BarChart3 },
+      { id: 'activity', label: 'Activity Feed', icon: Activity },
+      { id: 'inbox', label: 'Inbox', icon: Inbox },
+    ],
+  },
+  {
+    label: 'Provisioning',
+    items: [
+      { id: 'new-tenant', label: 'New Tenant', icon: PlusCircle },
+    ],
+  },
+  {
+    label: 'Billing',
+    items: [
+      { id: 'billing', label: 'Billing', icon: Wallet },
     ],
   },
 ];

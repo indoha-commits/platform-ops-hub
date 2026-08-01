@@ -1,72 +1,52 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Menu } from 'lucide-react';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { Sidebar } from '@/app/components/Sidebar';
 import { OpsSidebarContent } from '@/app/components/OpsSidebarContent';
-import { getSupabase } from '@/app/auth/supabase';
 import { Sheet, SheetContent } from '@/app/components/ui/sheet';
-import { ActionPanelPage } from '@/app/components/pages/manager/ActionPanelPage';
-import { PipelinePage } from '@/app/components/pages/manager/PipelinePage';
-import { MonitoringPage } from '@/app/components/pages/manager/MonitoringPage';
-import { RiskCenterPage } from '@/app/components/pages/manager/RiskCenterPage';
-import { ShipmentsPage } from '@/app/components/pages/manager/ShipmentsPage';
-import { BillingPage } from '@/app/components/pages/manager/BillingPage';
-import { AdminDashboardPage } from '@/app/components/pages/manager/AdminDashboardPage';
-import { PaymentsPage } from '@/app/components/pages/manager/PaymentsPage';
-import { ReceivablesPage } from '@/app/components/pages/manager/ReceivablesPage';
+import DashboardPage from '@/app/components/pages/platform/DashboardPage';
+import TenantsPage from '@/app/components/pages/platform/TenantsPage';
+import ActivityPage from '@/app/components/pages/platform/ActivityPage';
+import InboxPage from '@/app/components/pages/platform/InboxPage';
+import NewTenantPage from '@/app/components/pages/platform/NewTenantPage';
+import BillingPage from '@/app/components/pages/platform/BillingPage';
+import TenantSettingsPage from '@/app/components/pages/platform/TenantSettingsPage';
 
-type ManagerPageId =
-  | 'shipments'
-  | 'payments'
-  | 'receivables'
-  | 'action-panel'
-  | 'pipeline'
-  | 'monitoring'
-  | 'risk-center'
-  | 'billing'
-  | 'admin';
+type PlatformPageId =
+  | 'dashboard'
+  | 'tenants'
+  | 'activity'
+  | 'inbox'
+  | 'new-tenant'
+  | 'billing';
 
-const pageToPath: Record<ManagerPageId, string> = {
-  shipments: 'shipments',
-  payments: 'payments',
-  receivables: 'receivables',
-  'action-panel': 'action-panel',
-  pipeline: 'pipeline',
-  monitoring: 'monitoring',
-  'risk-center': 'risk-center',
+const pageToPath: Record<PlatformPageId, string> = {
+  dashboard: 'dashboard',
+  tenants: 'tenants',
+  activity: 'activity',
+  inbox: 'inbox',
+  'new-tenant': 'new-tenant',
   billing: 'billing',
-  admin: 'admin',
 };
 
-const pathToPage: Record<string, ManagerPageId> = {
-  shipments: 'shipments',
-  payments: 'payments',
-  receivables: 'receivables',
-  'action-panel': 'action-panel',
-  pipeline: 'pipeline',
-  monitoring: 'monitoring',
-  'risk-center': 'risk-center',
+const pathToPage: Record<string, PlatformPageId> = {
+  dashboard: 'dashboard',
+  tenants: 'tenants',
+  activity: 'activity',
+  inbox: 'inbox',
+  'new-tenant': 'new-tenant',
   billing: 'billing',
-  admin: 'admin',
 };
 
-function requireEnv(name: string): string {
-  const v = (import.meta.env as any)[name] as string | undefined;
-  if (!v) throw new Error(`Missing required env var: ${name}`);
-  return v;
-}
-
-const authPortalUrl = requireEnv('VITE_AUTH_PORTAL_URL');
-
-function useManagerRouteState() {
+function usePlatformRouteState() {
   const navigate = useNavigate();
   const location = useLocation();
 
   const pageSlug = location.pathname.replace(/^\//, '');
-  const normalizedPage = pageSlug && pageSlug in pathToPage ? (pageSlug as ManagerPageId) : 'action-panel';
-  const currentPage = pathToPage[normalizedPage] ?? 'action-panel';
+  const normalizedPage = pageSlug && pageSlug in pathToPage ? (pageSlug as PlatformPageId) : 'dashboard';
+  const currentPage = pathToPage[normalizedPage] ?? 'dashboard';
 
-  const setCurrentPage = (page: ManagerPageId) => {
+  const setCurrentPage = (page: PlatformPageId) => {
     const pagePath = pageToPath[page];
     const target = `/${pagePath}`.replace(/\/+$/, '') || '/';
     if (target === location.pathname) return;
@@ -76,82 +56,31 @@ function useManagerRouteState() {
   return { currentPage, setCurrentPage };
 }
 
-function ManagerPageRenderer({
-  currentPage,
-}: {
-  currentPage: ManagerPageId;
-}) {
+function PlatformPageRenderer({ currentPage }: { currentPage: PlatformPageId }) {
   switch (currentPage) {
-    case 'shipments':
-      return <ShipmentsPage />;
-    case 'payments':
-      return <PaymentsPage />;
-    case 'receivables':
-      return <ReceivablesPage />;
-    case 'action-panel':
-      return <ActionPanelPage />;
-    case 'pipeline':
-      return <PipelinePage />;
-    case 'monitoring':
-      return <MonitoringPage />;
-    case 'risk-center':
-      return <RiskCenterPage />;
-    case 'billing':
-      return <BillingPage />;
-    case 'admin':
-      return <AdminDashboardPage />;
-    default:
-      return <ShipmentsPage />;
+    case 'dashboard': return <DashboardPage />;
+    case 'tenants': return <TenantsPage />;
+    case 'activity': return <ActivityPage />;
+    case 'inbox': return <InboxPage />;
+    case 'new-tenant': return <NewTenantPage />;
+    case 'billing': return <BillingPage />;
+    default: return <DashboardPage />;
   }
 }
 
 export default function App() {
-  const [dataSourceConnected, setDataSourceConnected] = useState<boolean | null>(true);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const { currentPage, setCurrentPage } = useManagerRouteState();
+  const { currentPage, setCurrentPage } = usePlatformRouteState();
   const currentPageMemo = useMemo(() => currentPage, [currentPage]);
 
-  useEffect(() => {
-    // External data sources disabled; skip checks
-    setDataSourceConnected(true);
-  }, []);
-
-  // Gate: show data source setup until connected
-  if (dataSourceConnected === false) {
-    // External data sources disabled; skip setup
-    return null;
-  }
-
-  if (dataSourceConnected === null) {
-    return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading…</div>;
-  }
-
-  const handleLogout = async () => {
-    try {
-      // Release internal session lock (best-effort)
-      const sessionId = window.sessionStorage.getItem('internal_session_id');
-      if (sessionId) {
-        try {
-          const { releaseInternalSession } = await import('@/app/api/ops');
-          await releaseInternalSession(sessionId);
-        } catch (e) {
-          console.warn('Failed to release internal session lock', e);
-        }
-      }
-
-      const sb = getSupabase();
-      await sb.auth.signOut();
-    } finally {
-      window.location.href = authPortalUrl;
-    }
+  const handleLogout = () => {
+    window.location.href = (import.meta.env as any).VITE_AUTH_PORTAL_URL || '/';
   };
 
   return (
     <div className="min-h-screen">
-      {/* Desktop sidebar */}
-      <Sidebar currentPage={currentPageMemo} onPageChange={(page) => setCurrentPage(page as ManagerPageId)} onLogout={handleLogout} />
+      <Sidebar currentPage={currentPageMemo} onPageChange={(page) => setCurrentPage(page as PlatformPageId)} onLogout={handleLogout} />
 
-      {/* Mobile top bar */}
       <div
         className="md:hidden sticky top-0 z-40 border-b px-4 py-3 flex items-center gap-3"
         style={{ backgroundColor: 'var(--background)', borderColor: 'var(--border)' }}
@@ -166,16 +95,15 @@ export default function App() {
           <Menu className="w-5 h-5" />
         </button>
         <div className="min-w-0 flex-1">
-          <img src="/indataflow-logo.png" alt="InDataFlow" className="h-7 w-auto brightness-0 dark:invert" />
+          <img src="/indataflow-logo.png" alt="Platform Ops Hub" className="h-7 w-auto brightness-0 dark:invert" />
         </div>
       </div>
 
-      {/* Mobile nav drawer */}
       <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
         <SheetContent side="left" className="p-0" style={{ backgroundColor: 'var(--sidebar)' }}>
           <OpsSidebarContent
             currentPage={currentPageMemo}
-            onPageChange={(page) => setCurrentPage(page as ManagerPageId)}
+            onPageChange={(page) => setCurrentPage(page as PlatformPageId)}
             onLogout={handleLogout}
             onNavigate={() => setMobileNavOpen(false)}
           />
@@ -184,12 +112,10 @@ export default function App() {
 
       <main className="min-h-screen px-4 py-4 sm:px-6 sm:py-6 md:ml-64 md:px-12 md:py-10">
         <Routes>
-          <Route path="/" element={<Navigate to="/shipments" replace />} />
-          <Route
-            path="/:pageSlug"
-            element={<ManagerPageRenderer key={currentPageMemo} currentPage={currentPageMemo} />}
-          />
-          <Route path="*" element={<Navigate to="/shipments" replace />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/tenant/:id" element={<TenantSettingsPage />} />
+          <Route path="/:pageSlug" element={<PlatformPageRenderer key={currentPageMemo} currentPage={currentPageMemo} />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </main>
     </div>

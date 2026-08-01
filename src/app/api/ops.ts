@@ -3,7 +3,7 @@ import { fetchJson } from './client';
 export type MeResponse = {
   id: string;
   email: string;
-  role: 'client' | 'ops' | 'admin' | 'manager';
+  role: 'client' | 'ops' | 'admin' | 'manager' | 'superops';
   client_id: string | null;
   tenant_id?: string | null;
   dashboard_type?: string | null;
@@ -11,7 +11,7 @@ export type MeResponse = {
 };
 
 export async function getMe(): Promise<MeResponse> {
-  return await fetchJson<MeResponse>('/me?prefer_dashboard=manager');
+  return await fetchJson<MeResponse>('/me');
 }
 
 export type ClaimInternalSessionResponse =
@@ -266,9 +266,9 @@ export type AdminStats = {
   current_month: string;
   total_usage: {
     cargo_count: number;
-    document_count: number;
-    event_count: number;
-    ai_conversation_count: number;
+    whatsapp_message_count: number;
+    ocr_doc_count: number;
+    ai_extraction_count: number;
   };
 };
 
@@ -281,18 +281,60 @@ export type AdminTenantRow = {
   pricing_tier: string;
   shipment_cap: number | null;
   overage_rate: number | null;
+  whatsapp_cap: number | null;
+  ocr_cap: number | null;
+  ai_cap: number | null;
+  whatsapp_overage_rate: number | null;
+  ocr_overage_rate: number | null;
+  ai_overage_rate: number | null;
+  ai_conversation_enabled: boolean;
+  jarvis_auto_extract: boolean;
+  jarvis_auto_create: boolean;
+  doc_analysis_enabled: boolean;
   usage: number;
   usage_pct: number | null;
   estimated_bill: number;
   created_at: string;
 };
 
+export type UpdateAdminTenantPayload = {
+  pricing_tier?: string;
+  shipment_cap?: number | null;
+  overage_rate?: number | null;
+  whatsapp_cap?: number | null;
+  ocr_cap?: number | null;
+  ai_cap?: number | null;
+  whatsapp_overage_rate?: number | null;
+  ocr_overage_rate?: number | null;
+  ai_overage_rate?: number | null;
+  status?: string;
+  ai_conversation_enabled?: boolean;
+  jarvis_auto_extract?: boolean;
+  jarvis_auto_create?: boolean;
+  doc_analysis_enabled?: boolean;
+};
+
+export type AdminTenantUpdateResponse = {
+  ok: true;
+  tenant: AdminTenantRow;
+};
+
 export async function getAdminStats(): Promise<AdminStats> {
-  return await fetchJson<AdminStats>('/ops/admin/stats');
+  return await fetchJson<AdminStats>('/superops/admin/stats');
 }
 
 export async function getAdminTenants(): Promise<{ tenants: AdminTenantRow[] }> {
-  return await fetchJson<{ tenants: AdminTenantRow[] }>('/ops/admin/tenants');
+  return await fetchJson<{ tenants: AdminTenantRow[] }>('/superops/admin/tenants');
+}
+
+export async function updateAdminTenant(
+  tenantId: string,
+  fields: UpdateAdminTenantPayload,
+): Promise<AdminTenantUpdateResponse> {
+  return await fetchJson<AdminTenantUpdateResponse>(`/superops/admin/tenants/${encodeURIComponent(tenantId)}`, {
+    method: 'PATCH',
+    body: JSON.stringify(fields),
+  });
 }
 
 export async function sendPaymentInvoice(
@@ -643,5 +685,92 @@ export async function createOpsCargoApproval(
   return await fetchJson<OpsCreateCargoApprovalResponse>(`/ops/cargo/${encodeURIComponent(cargoId)}/approvals`, {
     method: 'POST',
     body: JSON.stringify(payload),
+  });
+}
+
+// ── Platform Ops Hub API ──────────────────────────────────────────────────
+
+export type CreateTenantRequest = {
+  company_name: string;
+  admin_email: string;
+  product: 'indataflow' | 'autoevolve';
+  pricing_tier: 'starter' | 'growth' | 'custom';
+  custom_price?: number;
+  country?: string;
+  currency?: string;
+  phone?: string;
+  manager_phone?: string;
+};
+
+export type CreateTenantResponse = {
+  tenant_id: string;
+  subdomain: string;
+  admin_email: string;
+  admin_user_id: string | null;
+  login_link: string | null;
+  pricing_tier: string;
+  product: string;
+};
+
+export async function createTenant(payload: CreateTenantRequest): Promise<CreateTenantResponse> {
+  return await fetchJson<CreateTenantResponse>('/admin/tenants/create', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export type InboxItem = {
+  id: string;
+  created_at: string;
+  from_number?: string;
+  from_email?: string;
+  to_email?: string;
+  subject?: string;
+  caption?: string;
+  filename?: string;
+  doc_type?: string;
+  status: string;
+  matched_cargo_id?: string | null;
+  matched_cargo_container?: string | null;
+  matched_client_name?: string | null;
+};
+
+export async function getWhatsappInbox(params?: { status?: string; limit?: number }): Promise<{ items: InboxItem[] }> {
+  const query = new URLSearchParams();
+  if (params?.status) query.set('status', params.status);
+  if (params?.limit) query.set('limit', String(params.limit));
+  return await fetchJson(`/ops/whatsapp-inbox?${query.toString()}`);
+}
+
+export async function assignWhatsappInboxItem(itemId: string, cargoId: string): Promise<{ ok: boolean; cargo_id: string; document_id: string | null }> {
+  return await fetchJson(`/ops/whatsapp-inbox/${encodeURIComponent(itemId)}/assign`, {
+    method: 'POST',
+    body: JSON.stringify({ cargo_id: cargoId }),
+  });
+}
+
+export async function dismissWhatsappInboxItem(itemId: string): Promise<{ ok: boolean }> {
+  return await fetchJson(`/ops/whatsapp-inbox/${encodeURIComponent(itemId)}/dismiss`, {
+    method: 'POST',
+  });
+}
+
+export async function getEmailInbox(params?: { status?: string; limit?: number }): Promise<{ items: InboxItem[] }> {
+  const query = new URLSearchParams();
+  if (params?.status) query.set('status', params.status);
+  if (params?.limit) query.set('limit', String(params.limit));
+  return await fetchJson(`/ops/email-inbox?${query.toString()}`);
+}
+
+export async function assignEmailInboxItem(itemId: string, cargoId: string): Promise<{ ok: boolean; cargo_id: string; document_id: string | null }> {
+  return await fetchJson(`/ops/email-inbox/${encodeURIComponent(itemId)}/assign`, {
+    method: 'POST',
+    body: JSON.stringify({ cargo_id: cargoId }),
+  });
+}
+
+export async function dismissEmailInboxItem(itemId: string): Promise<{ ok: boolean }> {
+  return await fetchJson(`/ops/email-inbox/${encodeURIComponent(itemId)}/dismiss`, {
+    method: 'POST',
   });
 }

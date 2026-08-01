@@ -45,22 +45,16 @@ export function AuthGateInternal({ children }: { children: React.ReactNode }) {
             return;
           }
 
-          // Manager dashboard is allowlisted via mt_tenant_users.dashboard_type='manager'
-          // and gated by membership_status='active'.
+          // Control hub is restricted to platform super-ops operators
+          // (mt_platform_user_roles.role === 'superops').
           try {
             const me = await getMe();
-            const dt = String(me.dashboard_type || '');
-            const ms = String(me.membership_status || 'active');
-            if (dt !== 'manager') {
-              setAccessDenied('This dashboard is restricted to approved manager accounts.');
-              return;
-            }
-            if (ms !== 'active') {
-              setAccessDenied(`Your manager access is not active (status: ${ms}).`);
+            if (me.role !== 'superops') {
+              setAccessDenied('This dashboard is restricted to approved super-ops accounts.');
               return;
             }
           } catch (e) {
-            setAccessDenied(`Unable to verify manager access: ${e instanceof Error ? e.message : String(e)}`);
+            setAccessDenied(`Unable to verify super-ops access: ${e instanceof Error ? e.message : String(e)}`);
             return;
           }
 
