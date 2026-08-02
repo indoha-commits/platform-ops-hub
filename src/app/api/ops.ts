@@ -739,18 +739,18 @@ export async function getWhatsappInbox(params?: { status?: string; limit?: numbe
   const query = new URLSearchParams();
   if (params?.status) query.set('status', params.status);
   if (params?.limit) query.set('limit', String(params.limit));
-  return await fetchJson(`/ops/whatsapp-inbox?${query.toString()}`);
+  return await fetchJson(`/superops/admin/inbox/whatsapp?${query.toString()}`);
 }
 
 export async function assignWhatsappInboxItem(itemId: string, cargoId: string): Promise<{ ok: boolean; cargo_id: string; document_id: string | null }> {
-  return await fetchJson(`/ops/whatsapp-inbox/${encodeURIComponent(itemId)}/assign`, {
+  return await fetchJson(`/superops/admin/inbox/whatsapp/${encodeURIComponent(itemId)}/assign`, {
     method: 'POST',
     body: JSON.stringify({ cargo_id: cargoId }),
   });
 }
 
 export async function dismissWhatsappInboxItem(itemId: string): Promise<{ ok: boolean }> {
-  return await fetchJson(`/ops/whatsapp-inbox/${encodeURIComponent(itemId)}/dismiss`, {
+  return await fetchJson(`/superops/admin/inbox/whatsapp/${encodeURIComponent(itemId)}/dismiss`, {
     method: 'POST',
   });
 }
@@ -759,18 +759,18 @@ export async function getEmailInbox(params?: { status?: string; limit?: number }
   const query = new URLSearchParams();
   if (params?.status) query.set('status', params.status);
   if (params?.limit) query.set('limit', String(params.limit));
-  return await fetchJson(`/ops/email-inbox?${query.toString()}`);
+  return await fetchJson(`/superops/admin/inbox/email?${query.toString()}`);
 }
 
 export async function assignEmailInboxItem(itemId: string, cargoId: string): Promise<{ ok: boolean; cargo_id: string; document_id: string | null }> {
-  return await fetchJson(`/ops/email-inbox/${encodeURIComponent(itemId)}/assign`, {
+  return await fetchJson(`/superops/admin/inbox/email/${encodeURIComponent(itemId)}/assign`, {
     method: 'POST',
     body: JSON.stringify({ cargo_id: cargoId }),
   });
 }
 
 export async function dismissEmailInboxItem(itemId: string): Promise<{ ok: boolean }> {
-  return await fetchJson(`/ops/email-inbox/${encodeURIComponent(itemId)}/dismiss`, {
+  return await fetchJson(`/superops/admin/inbox/email/${encodeURIComponent(itemId)}/dismiss`, {
     method: 'POST',
   });
 }
