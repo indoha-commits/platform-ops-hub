@@ -1,8 +1,12 @@
 import {
   Activity,
+  AlertTriangle,
   BarChart3,
   Building2,
+  Cpu,
+  FileText,
   Inbox,
+  Layers,
   LogOut,
   Moon,
   PlusCircle,
@@ -11,6 +15,7 @@ import {
   Sun,
   User,
   Wallet,
+  Webhook,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -49,6 +54,12 @@ const navGroups: NavGroup[] = [
   {
     label: 'Monitoring',
     items: [
+      { id: 'monitoring', label: 'Overview', icon: Activity },
+      { id: 'errors', label: 'Errors', icon: AlertTriangle },
+      { id: 'queues', label: 'Queues & Jobs', icon: Layers },
+      { id: 'documents', label: 'Documents', icon: FileText },
+      { id: 'webhooks', label: 'Webhooks', icon: Webhook },
+      { id: 'vps', label: 'VPS', icon: Cpu },
       { id: 'activity', label: 'Activity Feed', icon: Activity },
       { id: 'inbox', label: 'Inbox', icon: Inbox },
     ],

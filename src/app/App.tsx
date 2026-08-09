@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Menu } from 'lucide-react';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import { Sidebar } from '@/app/components/Sidebar';
 import { OpsSidebarContent } from '@/app/components/OpsSidebarContent';
 import { Sheet, SheetContent } from '@/app/components/ui/sheet';
@@ -11,6 +12,14 @@ import InboxPage from '@/app/components/pages/platform/InboxPage';
 import NewTenantPage from '@/app/components/pages/platform/NewTenantPage';
 import BillingPage from '@/app/components/pages/platform/BillingPage';
 import TenantSettingsPage from '@/app/components/pages/platform/TenantSettingsPage';
+import MonitorOverviewPage from '@/app/components/pages/platform/MonitorOverviewPage';
+import ErrorsPage from '@/app/components/pages/platform/ErrorsPage';
+import QueuesJobsPage from '@/app/components/pages/platform/QueuesJobsPage';
+import DocumentsProcessingPage from '@/app/components/pages/platform/DocumentsProcessingPage';
+import DocumentDetailPage from '@/app/components/pages/platform/DocumentDetailPage';
+import BatchInspectPage from '@/app/components/pages/platform/BatchInspectPage';
+import WebhooksPage from '@/app/components/pages/platform/WebhooksPage';
+import VpsHealthPage from '@/app/components/pages/platform/VpsHealthPage';
 
 type PlatformPageId =
   | 'dashboard'
@@ -18,7 +27,13 @@ type PlatformPageId =
   | 'activity'
   | 'inbox'
   | 'new-tenant'
-  | 'billing';
+  | 'billing'
+  | 'monitoring'
+  | 'errors'
+  | 'queues'
+  | 'documents'
+  | 'webhooks'
+  | 'vps';
 
 const pageToPath: Record<PlatformPageId, string> = {
   dashboard: 'dashboard',
@@ -27,6 +42,12 @@ const pageToPath: Record<PlatformPageId, string> = {
   inbox: 'inbox',
   'new-tenant': 'new-tenant',
   billing: 'billing',
+  monitoring: 'monitoring',
+  errors: 'monitoring/errors',
+  queues: 'monitoring/queues',
+  documents: 'monitoring/documents',
+  webhooks: 'monitoring/webhooks',
+  vps: 'monitoring/vps',
 };
 
 const pathToPage: Record<string, PlatformPageId> = {
@@ -36,6 +57,12 @@ const pathToPage: Record<string, PlatformPageId> = {
   inbox: 'inbox',
   'new-tenant': 'new-tenant',
   billing: 'billing',
+  monitoring: 'monitoring',
+  errors: 'errors',
+  queues: 'queues',
+  documents: 'documents',
+  webhooks: 'webhooks',
+  vps: 'vps',
 };
 
 function usePlatformRouteState() {
@@ -43,7 +70,8 @@ function usePlatformRouteState() {
   const location = useLocation();
 
   const pageSlug = location.pathname.replace(/^\//, '');
-  const normalizedPage = pageSlug && pageSlug in pathToPage ? (pageSlug as PlatformPageId) : 'dashboard';
+  let normalizedPage = (pageSlug && pageSlug in pathToPage ? (pageSlug as PlatformPageId) : 'dashboard');
+  if (pageSlug.startsWith('monitoring/document') || pageSlug.startsWith('monitoring/batch')) normalizedPage = 'documents';
   const currentPage = pathToPage[normalizedPage] ?? 'dashboard';
 
   const setCurrentPage = (page: PlatformPageId) => {
@@ -64,6 +92,12 @@ function PlatformPageRenderer({ currentPage }: { currentPage: PlatformPageId }) 
     case 'inbox': return <InboxPage />;
     case 'new-tenant': return <NewTenantPage />;
     case 'billing': return <BillingPage />;
+    case 'monitoring': return <MonitorOverviewPage />;
+    case 'errors': return <ErrorsPage />;
+    case 'queues': return <QueuesJobsPage />;
+    case 'documents': return <DocumentsProcessingPage />;
+    case 'webhooks': return <WebhooksPage />;
+    case 'vps': return <VpsHealthPage />;
     default: return <DashboardPage />;
   }
 }
@@ -79,6 +113,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen">
+      <Toaster richColors position="top-right" />
       <Sidebar currentPage={currentPageMemo} onPageChange={(page) => setCurrentPage(page as PlatformPageId)} onLogout={handleLogout} />
 
       <div
@@ -114,6 +149,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/tenant/:id" element={<TenantSettingsPage />} />
+          <Route path="/monitoring/document/:id" element={<DocumentDetailPage />} />
+          <Route path="/monitoring/batch/:id" element={<BatchInspectPage />} />
           <Route path="/:pageSlug" element={<PlatformPageRenderer key={currentPageMemo} currentPage={currentPageMemo} />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
