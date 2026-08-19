@@ -126,9 +126,9 @@ export function OpsSidebarContent({ currentPage, onPageChange, onLogout, onNavig
   const { theme, toggleTheme } = useThemeToggle();
 
   return (
-    <div className="flex flex-col min-h-full whitespace-nowrap">
+    <div className="flex flex-col h-full whitespace-nowrap">
       {/* Brand header */}
-      <div className="sticky top-0 z-10 flex items-center px-6 py-6 md:py-8 border-b" style={{ backgroundColor: 'var(--sidebar)', borderColor: 'var(--sidebar-border)' }}>
+      <div className="shrink-0 sticky top-0 z-10 flex items-center px-6 py-6 md:py-8 border-b" style={{ backgroundColor: 'var(--sidebar)', borderColor: 'var(--sidebar-border)' }}>
         <img
           src="/indataflow-logo.png"
           alt="InDataFlow"
@@ -137,7 +137,7 @@ export function OpsSidebarContent({ currentPage, onPageChange, onLogout, onNavig
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 md:py-6" aria-label="Main navigation">
+      <nav className="flex-1 min-h-0 overflow-y-auto px-3 py-4 md:py-6" aria-label="Main navigation">
         {navGroups.map((group) => (
           <div key={group.label} className="mb-6">
             <div

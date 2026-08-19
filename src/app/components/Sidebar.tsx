@@ -9,7 +9,7 @@ interface SidebarProps {
 export function Sidebar({ currentPage, onPageChange, onLogout }: SidebarProps) {
   return (
     <aside
-      className="hidden md:flex fixed left-0 top-0 h-screen w-64 flex-col"
+      className="hidden md:flex fixed left-0 top-0 h-screen w-64 flex-col overflow-hidden"
       style={{
         backgroundColor: 'var(--sidebar)',
         borderRight: '1px solid var(--sidebar-border)',
