@@ -391,6 +391,7 @@ export type AdminLeadRow = {
   phone: string | null;
   message: string | null;
   status: string;
+  pricing_tier: string | null;
   created_at: string;
   converted_at: string | null;
   converted_tenant_id: string | null;

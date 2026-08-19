@@ -44,7 +44,7 @@ export default function LeadsPage() {
     if (!window.confirm(`Convert "${lead.company || lead.name}" into a tenant and send the setup invoice to ${lead.email}?`)) return;
     setConvertingId(lead.id);
     try {
-      const res = await convertAdminLead(lead.id, 'starter');
+      const res = await convertAdminLead(lead.id, lead.pricing_tier ?? 'starter');
       toast.success(`Converted ${res.subdomain}. Setup invoice + MoMo email sent.`);
       await load(filter);
     } catch (e: any) {
@@ -83,6 +83,7 @@ export default function LeadsPage() {
                 <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-left">Lead</th>
                 <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-left">Contact</th>
                 <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-left">Monthly volume</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-left">Plan</th>
                 <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-left">Source</th>
                 <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-left">Status</th>
                 <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-right">Actions</th>
@@ -90,9 +91,9 @@ export default function LeadsPage() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} className="px-4 py-12 text-center text-muted-foreground text-sm">Loading…</td></tr>
+                <tr><td colSpan={7} className="px-4 py-12 text-center text-muted-foreground text-sm">Loading…</td></tr>
               ) : leads.length === 0 ? (
-                <tr><td colSpan={6} className="px-4 py-12 text-center text-muted-foreground text-sm">No leads found</td></tr>
+                <tr><td colSpan={7} className="px-4 py-12 text-center text-muted-foreground text-sm">No leads found</td></tr>
               ) : (
                 leads.map((lead) => (
                   <tr key={lead.id} className="border-t" style={{ borderColor: 'var(--border)' }}>
@@ -105,6 +106,18 @@ export default function LeadsPage() {
                       <div className="text-xs text-muted-foreground">{lead.phone || lead.country || '—'}</div>
                     </td>
                     <td className="px-4 py-3.5 text-sm">{lead.monthly_volume || '—'}</td>
+                    <td className="px-4 py-3.5">
+                      {lead.pricing_tier ? (
+                        <span
+                          className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize"
+                          style={{ backgroundColor: 'rgba(94, 106, 210, 0.15)', color: '#5e6ad2' }}
+                        >
+                          {lead.pricing_tier}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">—</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3.5 text-sm text-muted-foreground">{lead.source || lead.source_page || '—'}</td>
                     <td className="px-4 py-3.5">
                       <StatusPill status={lead.status} />
