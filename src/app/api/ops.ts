@@ -337,6 +337,22 @@ export async function updateAdminTenant(
   });
 }
 
+export type ResendInvoiceResponse = {
+  ok: true;
+  sent_to: string;
+  intent_id: string | null;
+  invoice_id: string | null;
+  pay_url: string;
+  reused_existing: boolean;
+};
+
+export async function resendTenantInvoice(tenantId: string): Promise<ResendInvoiceResponse> {
+  return await fetchJson<ResendInvoiceResponse>(
+    `/superops/admin/tenants/${encodeURIComponent(tenantId)}/resend-invoice`,
+    { method: 'POST' },
+  );
+}
+
 // ── SuperOps: payment verification queue ──
 
 export type AdminPaymentRow = {

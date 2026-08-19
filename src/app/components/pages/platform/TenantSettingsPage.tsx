@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, Building2, Loader2 } from 'lucide-react';
+import { ArrowLeft, Building2, Loader2, Mail } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getAdminTenants, updateAdminTenant } from '@/app/api/ops';
+import { getAdminTenants, resendTenantInvoice, updateAdminTenant } from '@/app/api/ops';
 import type { AdminTenantRow, UpdateAdminTenantPayload } from '@/app/api/ops';
 
 type CapKey = 'shipment_cap' | 'whatsapp_cap' | 'ocr_cap' | 'ai_cap';
@@ -107,6 +107,7 @@ export default function TenantSettingsPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [sendingInvoice, setSendingInvoice] = useState(false);
 
   const [tier, setTier] = useState('starter');
   const [status, setStatus] = useState('active');
@@ -196,6 +197,24 @@ export default function TenantSettingsPage() {
     }
   };
 
+  const handleResendInvoice = async () => {
+    if (!id) return;
+    setSendingInvoice(true);
+    setError('');
+    setSuccess('');
+    try {
+      const res = await resendTenantInvoice(id);
+      setSuccess(`Payment email sent to ${res.sent_to}${res.reused_existing ? ' (reused existing QR/reference)' : ' (created a new setup invoice)'}`);
+    } catch (e: any) {
+      const msg = e?.message || 'Failed to send payment email';
+      setError(msg.includes('email_not_configured')
+        ? 'Email provider is not configured on the worker (RESEND_API_KEY missing).'
+        : msg);
+    } finally {
+      setSendingInvoice(false);
+    }
+  };
+
   if (loading) {
     return <div className="flex items-center justify-center h-64 text-muted-foreground text-base">Loading…</div>;
   }
@@ -263,6 +282,21 @@ export default function TenantSettingsPage() {
               {['active', 'suspended', 'pending_payment', 'inactive'].map((s) => <option key={s} value={s}>{s.replace('_', ' ')}</option>)}
             </select>
           </div>
+          {status === 'pending_payment' && (
+            <button
+              type="button"
+              onClick={handleResendInvoice}
+              disabled={sendingInvoice}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-lg border px-3.5 py-2.5 text-sm font-semibold transition-colors disabled:opacity-50"
+              style={{ borderColor: 'var(--border)' }}
+            >
+              {sendingInvoice ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /> Sending payment email…</>
+              ) : (
+                <><Mail className="w-4 h-4" /> Send payment email</>
+              )}
+            </button>
+          )}
         </div>
 
         <div className="rounded-xl border p-5 space-y-4" style={{ borderColor: 'var(--border)' }}>
