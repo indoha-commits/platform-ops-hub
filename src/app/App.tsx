@@ -10,6 +10,7 @@ import TenantsPage from '@/app/components/pages/platform/TenantsPage';
 import ActivityPage from '@/app/components/pages/platform/ActivityPage';
 import InboxPage from '@/app/components/pages/platform/InboxPage';
 import NewTenantPage from '@/app/components/pages/platform/NewTenantPage';
+import LeadsPage from '@/app/components/pages/platform/LeadsPage';
 import BillingPage from '@/app/components/pages/platform/BillingPage';
 import TenantSettingsPage from '@/app/components/pages/platform/TenantSettingsPage';
 import MonitorOverviewPage from '@/app/components/pages/platform/MonitorOverviewPage';
@@ -27,6 +28,7 @@ type PlatformPageId =
   | 'activity'
   | 'inbox'
   | 'new-tenant'
+  | 'leads'
   | 'billing'
   | 'monitoring'
   | 'errors'
@@ -41,6 +43,7 @@ const pageToPath: Record<PlatformPageId, string> = {
   activity: 'activity',
   inbox: 'inbox',
   'new-tenant': 'new-tenant',
+  leads: 'leads',
   billing: 'billing',
   monitoring: 'monitoring',
   errors: 'monitoring/errors',
@@ -56,6 +59,7 @@ const pathToPage: Record<string, PlatformPageId> = {
   activity: 'activity',
   inbox: 'inbox',
   'new-tenant': 'new-tenant',
+  leads: 'leads',
   billing: 'billing',
   monitoring: 'monitoring',
   errors: 'errors',
@@ -91,6 +95,7 @@ function PlatformPageRenderer({ currentPage }: { currentPage: PlatformPageId }) 
     case 'activity': return <ActivityPage />;
     case 'inbox': return <InboxPage />;
     case 'new-tenant': return <NewTenantPage />;
+    case 'leads': return <LeadsPage />;
     case 'billing': return <BillingPage />;
     case 'monitoring': return <MonitorOverviewPage />;
     case 'errors': return <ErrorsPage />;

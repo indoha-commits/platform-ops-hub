@@ -14,6 +14,7 @@ import {
   Settings,
   Sun,
   User,
+  Users,
   Wallet,
   Webhook,
 } from 'lucide-react';
@@ -67,6 +68,7 @@ const navGroups: NavGroup[] = [
   {
     label: 'Provisioning',
     items: [
+      { id: 'leads', label: 'Leads', icon: Users },
       { id: 'new-tenant', label: 'New Tenant', icon: PlusCircle },
     ],
   },

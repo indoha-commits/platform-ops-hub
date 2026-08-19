@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { getAdminStats, getAdminTenants } from '@/app/api/ops';
-import type { AdminStats, AdminTenantRow } from '@/app/api/ops';
+import { toast } from 'sonner';
+import { getAdminStats, getAdminTenants, getAdminPayments, verifyAdminPayment } from '@/app/api/ops';
+import type { AdminStats, AdminTenantRow, AdminPaymentRow } from '@/app/api/ops';
 
 const MOCK_STATS: AdminStats = {
   mrr: 2750, arr: 33000, total_tenants: 4, active_tenants: 3,
@@ -33,18 +34,37 @@ function UsageBar({ used, cap }: { used: number; cap: number | null }) {
 export default function BillingPage() {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [tenants, setTenants] = useState<AdminTenantRow[]>([]);
+  const [payments, setPayments] = useState<AdminPaymentRow[]>([]);
+  const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    let cancelled = false;
+  const load = () => {
     Promise.all([
       getAdminStats().catch(() => MOCK_STATS),
       getAdminTenants().catch(() => ({ tenants: MOCK_TENANTS })),
-    ]).then(([s, t]) => {
-      if (!cancelled) { setStats(s); setTenants(t.tenants); }
-    }).finally(() => { if (!cancelled) setLoading(false); });
-    return () => { cancelled = true; };
+      getAdminPayments('pending_confirmation').catch(() => ({ payments: [] })),
+    ]).then(([s, t, p]) => {
+      setStats(s); setTenants(t.tenants); setPayments(p.payments);
+    }).catch(() => {}).finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    load();
   }, []);
+
+  const handleVerify = async (payment: AdminPaymentRow) => {
+    if (!window.confirm(`Verify payment for ${payment.tenant_name || payment.tenant_id} (${payment.currency} ${payment.amount})? This activates the tenant and emails their dashboard credentials.`)) return;
+    setVerifyingId(payment.id);
+    try {
+      await verifyAdminPayment(payment.id);
+      toast.success(`Payment verified — ${payment.tenant_name || 'tenant'} activated.`);
+      load();
+    } catch (e: any) {
+      toast.error(e?.message || 'Verification failed');
+    } finally {
+      setVerifyingId(null);
+    }
+  };
 
   if (loading) return <div className="flex items-center justify-center h-64 text-muted-foreground text-base">Loading…</div>;
 
@@ -78,6 +98,57 @@ export default function BillingPage() {
           <div className="text-3xl font-bold tracking-tight mt-1.5 tabular-nums">${totalBill.toLocaleString()}</div>
         </div>
       </div>
+
+      {payments.length > 0 && (
+        <div className="rounded-xl border overflow-hidden" style={{ borderColor: 'var(--border)' }}>
+          <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: 'var(--border)' }}>
+            <div className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Pending MoMo confirmations</div>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 text-xs font-semibold">
+              {payments.length} awaiting verification
+            </span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b" style={{ borderColor: 'var(--border)' }}>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-left">Tenant</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-left">Invoice</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-left">MoMo ref / transaction</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-right">Amount</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {payments.map((p) => (
+                  <tr key={p.id} className="border-t" style={{ borderColor: 'var(--border)' }}>
+                    <td className="px-4 py-3.5">
+                      <div className="font-semibold">{p.tenant_name || p.tenant_id}</div>
+                      <div className="text-xs text-muted-foreground font-mono">{p.id.slice(0, 8)}</div>
+                    </td>
+                    <td className="px-4 py-3.5 font-mono text-xs">{p.invoice_number || '—'}</td>
+                    <td className="px-4 py-3.5">
+                      <div className="font-mono text-xs">{p.momo_reference || '—'}</div>
+                      <div className="text-xs text-muted-foreground">Tx: {p.momo_transaction_id || '—'}</div>
+                      {p.payer_phone && <div className="text-xs text-muted-foreground">Payer: {p.payer_phone}{p.payer_name ? ` (${p.payer_name})` : ''}</div>}
+                    </td>
+                    <td className="px-4 py-3.5 font-bold text-right tabular-nums">{p.currency} {p.amount.toLocaleString()}</td>
+                    <td className="px-4 py-3.5 text-right">
+                      <button
+                        onClick={() => handleVerify(p)}
+                        disabled={verifyingId === p.id}
+                        className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold text-white transition-opacity disabled:opacity-50"
+                        style={{ backgroundColor: '#22c55e' }}
+                      >
+                        {verifyingId === p.id ? 'Verifying…' : 'Verify payment'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
       <div className="rounded-xl border overflow-hidden" style={{ borderColor: 'var(--border)' }}>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">

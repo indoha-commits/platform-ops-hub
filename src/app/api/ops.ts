@@ -337,6 +337,98 @@ export async function updateAdminTenant(
   });
 }
 
+// ── SuperOps: payment verification queue ──
+
+export type AdminPaymentRow = {
+  id: string;
+  tenant_id: string;
+  tenant_name: string | null;
+  tenant_status: string | null;
+  invoice_id: string | null;
+  invoice_number: string | null;
+  invoice_status: string | null;
+  intent_type: string;
+  provider: string;
+  amount: number;
+  currency: string;
+  status: string;
+  momo_reference: string | null;
+  momo_transaction_id: string | null;
+  payer_phone: string | null;
+  payer_name: string | null;
+  last_error: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type AdminPaymentsResponse = {
+  payments: AdminPaymentRow[];
+};
+
+export async function getAdminPayments(status?: string): Promise<AdminPaymentsResponse> {
+  const q = status ? `?status=${encodeURIComponent(status)}` : '';
+  return await fetchJson<AdminPaymentsResponse>(`/superops/admin/payments${q}`);
+}
+
+export async function verifyAdminPayment(paymentIntentId: string): Promise<{ ok: true; already_completed: boolean }> {
+  return await fetchJson<{ ok: true; already_completed: boolean }>(
+    `/superops/admin/payments/${encodeURIComponent(paymentIntentId)}/verify`,
+    { method: 'POST' },
+  );
+}
+
+// ── SuperOps: lead conversion ──
+
+export type AdminLeadRow = {
+  id: string;
+  name: string;
+  company: string;
+  country: string | null;
+  email: string;
+  monthly_volume: string | null;
+  source: string | null;
+  source_page: string | null;
+  phone: string | null;
+  message: string | null;
+  status: string;
+  created_at: string;
+  converted_at: string | null;
+  converted_tenant_id: string | null;
+  converted_tenant_name: string | null;
+  converted_tenant_subdomain: string | null;
+};
+
+export type AdminLeadsResponse = {
+  leads: AdminLeadRow[];
+};
+
+export async function getAdminLeads(status?: string): Promise<AdminLeadsResponse> {
+  const q = status ? `?status=${encodeURIComponent(status)}` : '';
+  return await fetchJson<AdminLeadsResponse>(`/superops/admin/leads${q}`);
+}
+
+export type ConvertAdminLeadResponse = {
+  ok: true;
+  tenant_id: string;
+  subdomain: string;
+  pricing_tier: string;
+  admin_email: string;
+  invoice_id: string | null;
+  payment_intent_id: string | null;
+  pay_url: string;
+  momo_reference: string;
+};
+
+export async function convertAdminLead(leadId: string, pricingTier?: string): Promise<ConvertAdminLeadResponse> {
+  return await fetchJson<ConvertAdminLeadResponse>(
+    `/superops/admin/leads/${encodeURIComponent(leadId)}/convert`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ pricing_tier: pricingTier }),
+    },
+  );
+}
+
 export async function sendPaymentInvoice(
   paymentId: string,
   email: string,
