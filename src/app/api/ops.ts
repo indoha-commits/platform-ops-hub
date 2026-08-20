@@ -393,6 +393,45 @@ export async function verifyAdminPayment(paymentIntentId: string): Promise<{ ok:
   );
 }
 
+export type PaymentReportRow = {
+  id: string;
+  tenant_id: string;
+  tenant_name: string | null;
+  tenant_status: string | null;
+  invoice_id: string | null;
+  invoice_number: string | null;
+  invoice_status: string | null;
+  intent_type: string;
+  amount: number;
+  currency: string;
+  status: string;
+  momo_reference: string | null;
+  momo_transaction_id: string | null;
+  payer_phone: string | null;
+  payer_name: string | null;
+  confirmed_at: string | null;
+  last_error: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type PaymentReportResponse = {
+  date: string;
+  summary: {
+    pending_confirmation: { count: number; total: number };
+    completed: { count: number; total: number };
+    failed: { count: number; total: number };
+    pending: { count: number; total: number };
+    total: { count: number; total: number };
+  };
+  payments: PaymentReportRow[];
+};
+
+export async function getPaymentReport(date?: string): Promise<PaymentReportResponse> {
+  const q = date ? `?date=${encodeURIComponent(date)}` : '';
+  return await fetchJson<PaymentReportResponse>(`/superops/admin/payments/report${q}`);
+}
+
 // ── SuperOps: lead conversion ──
 
 export type AdminLeadRow = {
