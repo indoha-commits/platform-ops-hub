@@ -368,7 +368,6 @@ export type AdminPaymentRow = {
   amount: number;
   currency: string;
   status: string;
-  momo_reference: string | null;
   momo_transaction_id: string | null;
   payer_phone: string | null;
   payer_name: string | null;
@@ -405,7 +404,6 @@ export type PaymentReportRow = {
   amount: number;
   currency: string;
   status: string;
-  momo_reference: string | null;
   momo_transaction_id: string | null;
   payer_phone: string | null;
   payer_name: string | null;
@@ -472,7 +470,6 @@ export type ConvertAdminLeadResponse = {
   invoice_id: string | null;
   payment_intent_id: string | null;
   pay_url: string;
-  momo_reference: string;
 };
 
 export async function convertAdminLead(leadId: string, pricingTier?: string): Promise<ConvertAdminLeadResponse> {

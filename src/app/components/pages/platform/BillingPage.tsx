@@ -63,13 +63,13 @@ function statusBadgeClass(status: string): string {
 }
 
 function downloadCsv(report: PaymentReportResponse) {
-  const cols = ['date', 'tenant', 'invoice', 'intent_type', 'status', 'amount', 'currency', 'momo_reference', 'momo_transaction_id', 'payer_phone', 'payer_name', 'created_at', 'updated_at', 'last_error'];
+  const cols = ['date', 'tenant', 'invoice', 'intent_type', 'status', 'amount', 'currency', 'momo_transaction_id', 'payer_phone', 'payer_name', 'created_at', 'updated_at', 'last_error'];
   const esc = (v: unknown) => {
     const s = String(v ?? '');
     return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
   const rows = report.payments.map((p: PaymentReportRow) =>
-    [report.date, p.tenant_name, p.invoice_number, p.intent_type, p.status, p.amount, p.currency, p.momo_reference, p.momo_transaction_id, p.payer_phone, p.payer_name, p.created_at, p.updated_at, p.last_error].map(esc).join(',')
+    [report.date, p.tenant_name, p.invoice_number, p.intent_type, p.status, p.amount, p.currency, p.momo_transaction_id, p.payer_phone, p.payer_name, p.created_at, p.updated_at, p.last_error].map(esc).join(',')
   );
   const csv = [cols.join(','), ...rows].join('\n');
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -248,7 +248,6 @@ export default function BillingPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="font-mono text-xs font-semibold">{p.momo_transaction_id || '—'}</div>
-                      <div className="text-xs text-muted-foreground">Ref: {p.momo_reference || '—'}</div>
                       {p.payer_phone && <div className="text-xs text-muted-foreground">Payer: {p.payer_phone}{p.payer_name ? ` (${p.payer_name})` : ''}</div>}
                     </td>
                     <td className="px-4 py-3 font-bold text-right tabular-nums">{formatMoney(p.currency, p.amount)}</td>
@@ -309,7 +308,6 @@ export default function BillingPage() {
                   </td>
                   <td className="px-4 py-3.5">
                     <div className="font-mono text-xs font-semibold text-amber-700 dark:text-amber-300">{p.momo_transaction_id || '—'}</div>
-                    <div className="text-xs text-muted-foreground">Ref: {p.momo_reference || '—'}</div>
                     {p.payer_phone && <div className="text-xs text-muted-foreground">Payer: {p.payer_phone}{p.payer_name ? ` (${p.payer_name})` : ''}</div>}
                     {p.last_error && (
                       <div className="text-xs text-amber-600 dark:text-amber-400 mt-1">⚠ {p.last_error}</div>
