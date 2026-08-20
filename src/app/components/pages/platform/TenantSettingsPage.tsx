@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowLeft, Building2, Loader2, Mail } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getAdminTenants, resendTenantInvoice, updateAdminTenant } from '@/app/api/ops';
+import { getAdminTenants, resendTenantInvoice, updateAdminTenant, activateTenant } from '@/app/api/ops';
 import type { AdminTenantRow, UpdateAdminTenantPayload } from '@/app/api/ops';
 
 type CapKey = 'shipment_cap' | 'whatsapp_cap' | 'ocr_cap' | 'ai_cap';
@@ -108,6 +108,7 @@ export default function TenantSettingsPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [sendingInvoice, setSendingInvoice] = useState(false);
+  const [activating, setActivating] = useState(false);
 
   const [tier, setTier] = useState('starter');
   const [status, setStatus] = useState('active');
@@ -215,6 +216,28 @@ export default function TenantSettingsPage() {
     }
   };
 
+  const handleActivate = async () => {
+    if (!id) return;
+    if (!window.confirm('Activate this tenant and send the onboarding email (thank-you, booking/videos links, and dashboard credentials) to their admin?')) return;
+    setActivating(true);
+    setError('');
+    setSuccess('');
+    try {
+      const res = await activateTenant(id);
+      setStatus('active');
+      setSuccess(`Tenant activated. Onboarding email sent to ${res.sent_to}.${res.reset_password_url ? ' (reset-password link included)' : res.password ? ' (temp password included)' : ''}`);
+    } catch (e: any) {
+      const msg = e?.message || 'Failed to activate tenant';
+      setError(msg.includes('email_not_configured')
+        ? 'Email provider is not configured on the worker (RESEND_API_KEY missing).'
+        : msg.includes('tenant_activation_failed')
+          ? 'Tenant was activated but the email could not be sent.'
+          : msg);
+    } finally {
+      setActivating(false);
+    }
+  };
+
   if (loading) {
     return <div className="flex items-center justify-center h-64 text-muted-foreground text-base">Loading…</div>;
   }
@@ -297,6 +320,19 @@ export default function TenantSettingsPage() {
               )}
             </button>
           )}
+          <button
+            type="button"
+            onClick={handleActivate}
+            disabled={activating}
+            className="w-full inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2.5 text-sm font-semibold text-white transition-colors disabled:opacity-50"
+            style={{ backgroundColor: '#5e6ad2' }}
+          >
+            {activating ? (
+              <><Loader2 className="w-4 h-4 animate-spin" /> Activating & sending email…</>
+            ) : (
+              <><Building2 className="w-4 h-4" /> Activate & send email</>
+            )}
+          </button>
         </div>
 
         <div className="rounded-xl border p-5 space-y-4" style={{ borderColor: 'var(--border)' }}>

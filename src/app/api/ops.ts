@@ -353,6 +353,21 @@ export async function resendTenantInvoice(tenantId: string): Promise<ResendInvoi
   );
 }
 
+export type ActivateTenantResponse = {
+  ok: true;
+  sent_to: string;
+  status: 'active';
+  password: string | null;
+  reset_password_url: string | null;
+};
+
+export async function activateTenant(tenantId: string): Promise<ActivateTenantResponse> {
+  return await fetchJson<ActivateTenantResponse>(
+    `/superops/admin/tenants/${encodeURIComponent(tenantId)}/activate`,
+    { method: 'POST' },
+  );
+}
+
 // ── SuperOps: payment verification queue ──
 
 export type AdminPaymentRow = {
